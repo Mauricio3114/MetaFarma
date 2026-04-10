@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Farmácias | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Farmácias</h1>
+        <p>Gerencie todas as unidades cadastradas</p>
+    </div>
+
+    <a href="{{ url_for('farmacias.nova') }}" class="btn btn-primary">+ Nova farmácia</a>
+</div>
+
+<div class="card">
+    <form method="GET" class="filter-bar">
+        <input type="text" name="busca" value="{{ busca }}" placeholder="Buscar por nome da farmácia">
+        <button type="submit" class="btn btn-secondary">Buscar</button>
+    </form>
+</div>
+
+<div class="card">
+    {% if farmacias %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Responsável</th>
+                    <th>Cidade</th>
+                    <th>Telefone</th>
+                    <th>Status</th>
+                    <th width="140">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for farmacia in farmacias %}
+                <tr>
+                    <td>{{ farmacia.nome }}</td>
+                    <td>{{ farmacia.responsavel or "-" }}</td>
+                    <td>{{ farmacia.cidade or "-" }}</td>
+                    <td>{{ farmacia.telefone or "-" }}</td>
+                    <td>
+                        <span class="badge {% if farmacia.status == 'ativa' %}badge-success{% else %}badge-danger{% endif %}">
+                            {{ farmacia.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('farmacias.editar', farmacia_id=farmacia.id) }}" class="btn btn-small btn-secondary">Editar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="empty-state">Nenhuma farmácia encontrada.</p>
+    {% endif %}
+</div>
+{% endblock %}

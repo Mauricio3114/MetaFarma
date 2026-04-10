@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Metas | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Metas</h1>
+        <p>Gerencie as metas de cada farmácia</p>
+    </div>
+
+    <a href="{{ url_for('metas.nova') }}" class="btn btn-primary">+ Nova meta</a>
+</div>
+
+<div class="card">
+    <form method="GET" class="filter-bar filter-bar-3">
+        <select name="farmacia_id">
+            <option value="">Todas as farmácias</option>
+            {% for farmacia in farmacias %}
+                <option value="{{ farmacia.id }}" {% if farmacia_id == farmacia.id %}selected{% endif %}>
+                    {{ farmacia.nome }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="tipo">
+            <option value="">Todos os tipos</option>
+            <option value="diaria" {% if tipo == 'diaria' %}selected{% endif %}>Diária</option>
+            <option value="semanal" {% if tipo == 'semanal' %}selected{% endif %}>Semanal</option>
+            <option value="mensal" {% if tipo == 'mensal' %}selected{% endif %}>Mensal</option>
+            <option value="turno1" {% if tipo == 'turno1' %}selected{% endif %}>Turno 1</option>
+            <option value="turno2" {% if tipo == 'turno2' %}selected{% endif %}>Turno 2</option>
+        </select>
+
+        <button type="submit" class="btn btn-secondary">Filtrar</button>
+    </form>
+</div>
+
+<div class="card">
+    {% if metas %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Farmácia</th>
+                    <th>Tipo</th>
+                    <th>Valor meta</th>
+                    <th>Pedidos meta</th>
+                    <th>Data início</th>
+                    <th>Data fim</th>
+                    <th width="140">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for meta in metas %}
+                <tr>
+                    <td>{{ meta.farmacia.nome }}</td>
+                    <td>
+                        <span class="badge badge-info">
+                            {{ meta.tipo }}
+                        </span>
+                    </td>
+                    <td>R$ {{ "%.2f"|format(meta.valor_meta or 0) }}</td>
+                    <td>{{ meta.pedidos_meta or 0 }}</td>
+                    <td>
+                        {% if meta.data_inicio %}
+                            {{ meta.data_inicio.strftime('%d/%m/%Y') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if meta.data_fim %}
+                            {{ meta.data_fim.strftime('%d/%m/%Y') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('metas.editar', meta_id=meta.id) }}" class="btn btn-small btn-secondary">Editar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="empty-state">Nenhuma meta encontrada.</p>
+    {% endif %}
+</div>
+{% endblock %}

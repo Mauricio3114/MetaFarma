@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Resultados | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Resultados</h1>
+        <p>Gerencie os resultados lançados por farmácia e turno</p>
+    </div>
+
+    <a href="{{ url_for('resultados.novo') }}" class="btn btn-primary">+ Novo resultado</a>
+</div>
+
+<div class="card">
+    <form method="GET" class="filter-bar filter-bar-4">
+        <select name="farmacia_id">
+            <option value="">Todas as farmácias</option>
+            {% for farmacia in farmacias %}
+                <option value="{{ farmacia.id }}" {% if farmacia_id == farmacia.id %}selected{% endif %}>
+                    {{ farmacia.nome }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="turno">
+            <option value="">Todos os turnos</option>
+            <option value="turno1" {% if turno == 'turno1' %}selected{% endif %}>Turno 1</option>
+            <option value="turno2" {% if turno == 'turno2' %}selected{% endif %}>Turno 2</option>
+        </select>
+
+        <input type="date" name="data_resultado" value="{{ data_resultado }}">
+
+        <button type="submit" class="btn btn-secondary">Filtrar</button>
+    </form>
+</div>
+
+<div class="card">
+    {% if resultados %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Farmácia</th>
+                    <th>Equipe</th>
+                    <th>Turno</th>
+                    <th>Valor realizado</th>
+                    <th>Pedidos</th>
+                    <th width="140">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resultado in resultados %}
+                <tr>
+                    <td>{{ resultado.data_resultado.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ resultado.farmacia.nome }}</td>
+                    <td>{{ resultado.equipe.nome }}</td>
+                    <td><span class="badge badge-info">{{ resultado.turno }}</span></td>
+                    <td>R$ {{ "%.2f"|format(resultado.valor_realizado or 0) }}</td>
+                    <td>{{ resultado.pedidos_realizados or 0 }}</td>
+                    <td>
+                        <a href="{{ url_for('resultados.editar', resultado_id=resultado.id) }}" class="btn btn-small btn-secondary">Editar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="empty-state">Nenhum resultado encontrado.</p>
+    {% endif %}
+</div>
+{% endblock %}

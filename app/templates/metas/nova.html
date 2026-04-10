@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Nova Meta | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Nova meta</h1>
+        <p>Cadastre uma nova meta por farmácia</p>
+    </div>
+</div>
+
+<div class="card form-card">
+    <form method="POST" class="form-grid">
+        <div class="form-group">
+            <label>Farmácia</label>
+            <select name="farmacia_id" required>
+                <option value="">Selecione</option>
+                {% for farmacia in farmacias %}
+                    <option value="{{ farmacia.id }}">{{ farmacia.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Tipo de meta</label>
+            <select name="tipo" id="tipo_meta" required>
+                <option value="">Selecione</option>
+                <option value="diaria">Diária</option>
+                <option value="semanal">Semanal</option>
+                <option value="mensal">Mensal</option>
+                <option value="turno1">Turno 1</option>
+                <option value="turno2">Turno 2</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Valor da meta (R$)</label>
+            <input type="text" name="valor_meta" placeholder="Ex: 5000">
+        </div>
+
+        <div class="form-group">
+            <label>Meta de pedidos</label>
+            <input type="number" name="pedidos_meta" min="0" value="0">
+        </div>
+
+        <div class="form-group">
+            <label>Data início</label>
+            <input type="date" name="data_inicio" id="data_inicio">
+        </div>
+
+        <div class="form-group">
+            <label>Data fim</label>
+            <input type="date" name="data_fim" id="data_fim">
+        </div>
+
+        <div class="form-group full-width">
+            <label>Observação</label>
+            <textarea name="observacao" rows="4"></textarea>
+        </div>
+
+        <div class="form-actions full-width">
+            <a href="{{ url_for('metas.listar') }}" class="btn btn-secondary">Voltar</a>
+            <button type="submit" class="btn btn-primary">Salvar meta</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function formatarDataInput(data) {
+        const ano = data.getFullYear();
+        const mes = String(data.getMonth() + 1).padStart(2, "0");
+        const dia = String(data.getDate()).padStart(2, "0");
+        return `${ano}-${mes}-${dia}`;
+    }
+
+    function aplicarDatasPorTipo() {
+        const tipo = document.getElementById("tipo_meta").value;
+        const campoInicio = document.getElementById("data_inicio");
+        const campoFim = document.getElementById("data_fim");
+
+        if (!tipo) {
+            campoInicio.value = "";
+            campoFim.value = "";
+            return;
+        }
+
+        const hoje = new Date();
+
+        if (tipo === "diaria" || tipo === "turno1" || tipo === "turno2") {
+            const dataHoje = formatarDataInput(hoje);
+            campoInicio.value = dataHoje;
+            campoFim.value = dataHoje;
+            return;
+        }
+
+        if (tipo === "semanal") {
+            const diaSemana = hoje.getDay();
+            const diferencaParaSegunda = diaSemana === 0 ? -6 : 1 - diaSemana;
+
+            const inicioSemana = new Date(hoje);
+            inicioSemana.setDate(hoje.getDate() + diferencaParaSegunda);
+
+            const fimSemana = new Date(inicioSemana);
+            fimSemana.setDate(inicioSemana.getDate() + 6);
+
+            campoInicio.value = formatarDataInput(inicioSemana);
+            campoFim.value = formatarDataInput(fimSemana);
+            return;
+        }
+
+        if (tipo === "mensal") {
+            const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+
+            campoInicio.value = formatarDataInput(primeiroDia);
+            campoFim.value = formatarDataInput(ultimoDia);
+            return;
+        }
+    }
+
+    document.getElementById("tipo_meta").addEventListener("change", aplicarDatasPorTipo);
+</script>
+{% endblock %}

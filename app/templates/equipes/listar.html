@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Equipes | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Equipes</h1>
+        <p>Gerencie as equipes das farmácias</p>
+    </div>
+
+    <a href="{{ url_for('equipes.nova') }}" class="btn btn-primary">+ Nova equipe</a>
+</div>
+
+<div class="card">
+    <form method="GET" class="filter-bar filter-bar-4">
+        <select name="farmacia_id">
+            <option value="">Todas as farmácias</option>
+            {% for farmacia in farmacias %}
+                <option value="{{ farmacia.id }}" {% if farmacia_id == farmacia.id %}selected{% endif %}>
+                    {{ farmacia.nome }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="turno">
+            <option value="">Todos os turnos</option>
+            <option value="turno1" {% if turno == 'turno1' %}selected{% endif %}>Turno 1</option>
+            <option value="turno2" {% if turno == 'turno2' %}selected{% endif %}>Turno 2</option>
+        </select>
+
+        <select name="status">
+            <option value="">Todos os status</option>
+            <option value="ativa" {% if status == 'ativa' %}selected{% endif %}>Ativa</option>
+            <option value="inativa" {% if status == 'inativa' %}selected{% endif %}>Inativa</option>
+        </select>
+
+        <button type="submit" class="btn btn-secondary">Filtrar</button>
+    </form>
+</div>
+
+<div class="card">
+    {% if equipes %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Farmácia</th>
+                    <th>Equipe</th>
+                    <th>Turno</th>
+                    <th>Responsável</th>
+                    <th>Status</th>
+                    <th width="140">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for equipe in equipes %}
+                <tr>
+                    <td>{{ equipe.farmacia.nome }}</td>
+                    <td>{{ equipe.nome }}</td>
+                    <td>
+                        <span class="badge badge-info">{{ equipe.turno }}</span>
+                    </td>
+                    <td>{{ equipe.responsavel or "-" }}</td>
+                    <td>
+                        <span class="badge {% if equipe.status == 'ativa' %}badge-success{% else %}badge-danger{% endif %}">
+                            {{ equipe.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('equipes.editar', equipe_id=equipe.id) }}" class="btn btn-small btn-secondary">Editar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="empty-state">Nenhuma equipe encontrada.</p>
+    {% endif %}
+</div>
+{% endblock %}

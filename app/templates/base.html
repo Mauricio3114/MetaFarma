@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}MetaFarma{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <div class="sidebar">
+    <div class="brand">
+        <h2>MetaFarma</h2>
+        <p>Painel administrativo</p>
+    </div>
+
+    <div class="menu">
+        <a href="/dashboard/" class="menu-item active">
+            📊 Dashboard
+        </a>
+
+        <a href="/farmacias/" class="menu-item">
+            🏥 Farmácias
+        </a>
+
+        <a href="/metas/" class="menu-item">
+            🎯 Metas
+        </a>
+
+        <a href="/equipes/" class="menu-item">
+            👥 Equipes
+        </a>
+
+        <a href="/resultados/" class="menu-item">
+            💰 Resultados
+        </a>
+
+        <a href="/relatorios/" class="menu-item">
+            📄 Relatórios
+        </a>
+
+        <a href="/logout" class="menu-item logout">
+            🚪 Sair
+        </a>
+    </div>
+</div>
+    {% endif %}
+
+    <main class="{% if current_user.is_authenticated %}main-content{% else %}main-auth{% endif %}">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-area">
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

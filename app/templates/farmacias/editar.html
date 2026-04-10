@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Farmácia | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Editar farmácia</h1>
+        <p>Atualize os dados da unidade</p>
+    </div>
+</div>
+
+<div class="card form-card">
+    <form method="POST" class="form-grid">
+        <div class="form-group">
+            <label>Nome da farmácia</label>
+            <input type="text" name="nome" value="{{ farmacia.nome }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Responsável</label>
+            <input type="text" name="responsavel" value="{{ farmacia.responsavel or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Cidade</label>
+            <input type="text" name="cidade" value="{{ farmacia.cidade or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Telefone</label>
+            <input type="text" name="telefone" value="{{ farmacia.telefone or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Status</label>
+            <select name="status">
+                <option value="ativa" {% if farmacia.status == 'ativa' %}selected{% endif %}>Ativa</option>
+                <option value="inativa" {% if farmacia.status == 'inativa' %}selected{% endif %}>Inativa</option>
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Observação</label>
+            <textarea name="observacao" rows="4">{{ farmacia.observacao or '' }}</textarea>
+        </div>
+
+        <div class="form-actions full-width">
+            <a href="{{ url_for('farmacias.listar') }}" class="btn btn-secondary">Voltar</a>
+            <button type="submit" class="btn btn-primary">Atualizar farmácia</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

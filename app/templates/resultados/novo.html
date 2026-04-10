@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Resultado | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Novo resultado</h1>
+        <p>Lance o resultado realizado por farmácia e equipe</p>
+    </div>
+</div>
+
+<div class="card form-card">
+    <form method="POST" class="form-grid">
+        <div class="form-group">
+            <label>Farmácia</label>
+            <select name="farmacia_id" id="farmacia_id" required>
+                <option value="">Selecione</option>
+                {% for farmacia in farmacias %}
+                    <option value="{{ farmacia.id }}">{{ farmacia.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Equipe</label>
+            <select name="equipe_id" id="equipe_id" required>
+                <option value="">Selecione</option>
+                {% for equipe in equipes %}
+                    <option value="{{ equipe.id }}" data-farmacia="{{ equipe.farmacia_id }}">
+                        {{ equipe.nome }} - {{ equipe.turno }} - {{ equipe.farmacia.nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Data do resultado</label>
+            <input type="date" name="data_resultado" value="{{ hoje.strftime('%Y-%m-%d') }}">
+        </div>
+
+        <div class="form-group">
+            <label>Valor realizado (R$)</label>
+            <input type="text" name="valor_realizado" placeholder="Ex: 3500,00" required>
+        </div>
+
+        <div class="form-group">
+            <label>Pedidos realizados</label>
+            <input type="number" name="pedidos_realizados" min="0" value="0">
+        </div>
+
+        <div class="form-group full-width">
+            <label>Observação</label>
+            <textarea name="observacao" rows="4"></textarea>
+        </div>
+
+        <div class="form-actions full-width">
+            <a href="{{ url_for('resultados.listar') }}" class="btn btn-secondary">Voltar</a>
+            <button type="submit" class="btn btn-primary">Salvar resultado</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const farmaciaSelect = document.getElementById("farmacia_id");
+    const equipeSelect = document.getElementById("equipe_id");
+
+    function filtrarEquipesPorFarmacia() {
+        const farmaciaId = farmaciaSelect.value;
+
+        Array.from(equipeSelect.options).forEach(option => {
+            if (!option.value) {
+                option.hidden = false;
+                return;
+            }
+
+            const farmaciaEquipe = option.getAttribute("data-farmacia");
+            option.hidden = farmaciaId && farmaciaEquipe !== farmaciaId;
+        });
+
+        if (equipeSelect.selectedOptions.length && equipeSelect.selectedOptions[0].hidden) {
+            equipeSelect.value = "";
+        }
+    }
+
+    farmaciaSelect.addEventListener("change", filtrarEquipesPorFarmacia);
+</script>
+{% endblock %}
