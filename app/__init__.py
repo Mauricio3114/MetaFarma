@@ -32,6 +32,11 @@ def create_app():
     from app.routes.metas import metas_bp
     from app.routes.equipes import equipes_bp
     from app.routes.resultados import resultados_bp
+    from app.routes.badges import badges_bp
+    from app.routes.vendedoras import vendedoras_bp
+    from app.routes.escalas_semanais import escalas_semanais_bp
+    from app.routes.escalas_vendedoras import escalas_vendedoras_bp
+    from app.routes.resultados_vendedoras import resultados_vendedoras_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
@@ -39,6 +44,11 @@ def create_app():
     app.register_blueprint(metas_bp)
     app.register_blueprint(equipes_bp)
     app.register_blueprint(resultados_bp)
+    app.register_blueprint(badges_bp)
+    app.register_blueprint(vendedoras_bp)
+    app.register_blueprint(escalas_semanais_bp)
+    app.register_blueprint(escalas_vendedoras_bp)
+    app.register_blueprint(resultados_vendedoras_bp)
 
     with app.app_context():
         db.create_all()

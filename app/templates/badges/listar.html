@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Badges de Meta | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Badges de Meta</h1>
+        <p>Cadastre as cores e os valores por turno</p>
+    </div>
+
+    <a href="{{ url_for('badges.nova') }}" class="btn btn-primary">+ Nova badge</a>
+</div>
+
+<div class="card">
+    <form method="GET" class="filter-bar">
+        <select name="status">
+            <option value="">Todos os status</option>
+            <option value="ativa" {% if status == 'ativa' %}selected{% endif %}>Ativa</option>
+            <option value="inativa" {% if status == 'inativa' %}selected{% endif %}>Inativa</option>
+        </select>
+
+        <button type="submit" class="btn btn-secondary">Filtrar</button>
+    </form>
+</div>
+
+<div class="card">
+    {% if badges %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Cor</th>
+                    <th>Nome</th>
+                    <th>Valor manhã</th>
+                    <th>Valor tarde</th>
+                    <th>Status</th>
+                    <th width="140">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for badge in badges %}
+                <tr>
+                    <td>
+                        <span style="
+                            display:inline-block;
+                            width:28px;
+                            height:28px;
+                            border-radius:50%;
+                            background: {{ badge.cor_hex }};
+                            border: 2px solid #dbe4f0;
+                        "></span>
+                    </td>
+                    <td>{{ badge.nome }}</td>
+                    <td>R$ {{ "%.2f"|format(badge.valor_manha or 0) }}</td>
+                    <td>R$ {{ "%.2f"|format(badge.valor_tarde or 0) }}</td>
+                    <td>
+                        <span class="badge {% if badge.status == 'ativa' %}badge-success{% else %}badge-danger{% endif %}">
+                            {{ badge.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('badges.editar', badge_id=badge.id) }}" class="btn btn-small btn-secondary">Editar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="empty-state">Nenhuma badge cadastrada ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}

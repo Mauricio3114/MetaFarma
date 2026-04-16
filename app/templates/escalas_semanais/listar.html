@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Escalas Semanais | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Escalas Semanais</h1>
+        <p>Monte a badge e a quantidade de vendedoras por turno em cada dia</p>
+    </div>
+
+    <a href="{{ url_for('escalas_semanais.nova') }}" class="btn btn-primary">+ Nova escala</a>
+</div>
+
+<div class="card">
+    <form method="GET" class="filter-bar">
+        <select name="farmacia_id">
+            <option value="">Todas as farmácias</option>
+            {% for farmacia in farmacias %}
+                <option value="{{ farmacia.id }}" {% if farmacia_id == farmacia.id %}selected{% endif %}>
+                    {{ farmacia.nome }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="btn btn-secondary">Filtrar</button>
+    </form>
+</div>
+
+<div class="card">
+    {% if escalas %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Farmácia</th>
+                    <th>Dia</th>
+                    <th>Badge</th>
+                    <th>Valor manhã</th>
+                    <th>Qtde manhã</th>
+                    <th>Meta indiv. manhã</th>
+                    <th>Valor tarde</th>
+                    <th>Qtde tarde</th>
+                    <th>Meta indiv. tarde</th>
+                    <th width="140">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for escala in escalas %}
+                <tr>
+                    <td>{{ escala.farmacia.nome }}</td>
+                    <td>{{ escala.dia_semana }}</td>
+                    <td>
+                        <span class="badge" style="background: {{ escala.badge.cor_hex }}; color: #ffffff;">
+                            {{ escala.badge.nome }}
+                        </span>
+                    </td>
+                    <td>R$ {{ "%.2f"|format(escala.badge.valor_manha or 0) }}</td>
+                    <td>{{ escala.quantidade_manha or 0 }}</td>
+                    <td>R$ {{ "%.2f"|format(escala.meta_individual_manha()) }}</td>
+                    <td>R$ {{ "%.2f"|format(escala.badge.valor_tarde or 0) }}</td>
+                    <td>{{ escala.quantidade_tarde or 0 }}</td>
+                    <td>R$ {{ "%.2f"|format(escala.meta_individual_tarde()) }}</td>
+                    <td>
+                        <a href="{{ url_for('escalas_semanais.editar', escala_id=escala.id) }}" class="btn btn-small btn-secondary">Editar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="empty-state">Nenhuma escala semanal cadastrada ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}

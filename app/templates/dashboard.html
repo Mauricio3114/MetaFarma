@@ -168,6 +168,145 @@
     </div>
 </div>
 
+<div class="card mt-20 premium-table-card">
+    <div class="card-header">
+        <h3>Escala do dia atual — {{ dia_semana_hoje }}</h3>
+    </div>
+
+    {% if escalas_hoje %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Farmácia</th>
+                        <th>Badge</th>
+                        <th>Valor manhã</th>
+                        <th>Qtde manhã</th>
+                        <th>Meta indiv. manhã</th>
+                        <th>Valor tarde</th>
+                        <th>Qtde tarde</th>
+                        <th>Meta indiv. tarde</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for escala in escalas_hoje %}
+                    <tr>
+                        <td>{{ escala.farmacia.nome }}</td>
+                        <td>
+                            <span class="badge" style="background: {{ escala.badge.cor_hex }}; color: #ffffff;">
+                                {{ escala.badge.nome }}
+                            </span>
+                        </td>
+                        <td>R$ {{ "%.2f"|format(escala.badge.valor_manha or 0) }}</td>
+                        <td>{{ escala.quantidade_manha or 0 }}</td>
+                        <td>R$ {{ "%.2f"|format(escala.meta_individual_manha()) }}</td>
+                        <td>R$ {{ "%.2f"|format(escala.badge.valor_tarde or 0) }}</td>
+                        <td>{{ escala.quantidade_tarde or 0 }}</td>
+                        <td>R$ {{ "%.2f"|format(escala.meta_individual_tarde()) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-state">Nenhuma escala cadastrada para hoje.</p>
+    {% endif %}
+</div>
+
+<div class="card mt-20 premium-table-card">
+    <div class="card-header">
+        <h3>Vendedoras do dia atual — {{ dia_semana_hoje }}</h3>
+    </div>
+
+    {% if painel_vendedoras_hoje %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Farmácia</th>
+                        <th>Vendedora</th>
+                        <th>Turno</th>
+                        <th>Badge</th>
+                        <th>Valor do turno</th>
+                        <th>Qtde no turno</th>
+                        <th>Meta individual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in painel_vendedoras_hoje %}
+                    <tr>
+                        <td>{{ item.farmacia_nome }}</td>
+                        <td>{{ item.vendedora_nome }}</td>
+                        <td><span class="badge badge-info">{{ item.turno }}</span></td>
+                        <td>
+                            <span class="badge" style="background: {{ item.badge_cor }}; color: #ffffff;">
+                                {{ item.badge_nome }}
+                            </span>
+                        </td>
+                        <td>R$ {{ "%.2f"|format(item.valor_turno or 0) }}</td>
+                        <td>{{ item.quantidade_turno or 0 }}</td>
+                        <td><strong>R$ {{ "%.2f"|format(item.meta_individual or 0) }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-state">Nenhuma vendedora escalada para hoje.</p>
+    {% endif %}
+</div>
+
+<div class="card mt-20 premium-table-card">
+    <div class="card-header">
+        <h3>Ranking das Vendedoras (Hoje)</h3>
+    </div>
+
+    {% if ranking_vendedoras %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Vendedora</th>
+                        <th>Farmácia</th>
+                        <th>Turno</th>
+                        <th>Meta</th>
+                        <th>Realizado</th>
+                        <th>%</th>
+                        <th>Falta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in ranking_vendedoras %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ v.nome }}</td>
+                        <td>{{ v.farmacia }}</td>
+                        <td>{{ v.turno }}</td>
+                        <td>R$ {{ "%.2f"|format(v.meta) }}</td>
+                        <td>R$ {{ "%.2f"|format(v.realizado) }}</td>
+                        <td>
+                            <span class="
+                                badge
+                                {% if v.percentual >= 100 %}badge-success
+                                {% elif v.percentual >= 70 %}badge-info
+                                {% else %}badge-danger blink-soft
+                                {% endif %}
+                            ">
+                                {{ v.percentual }}%
+                            </span>
+                        </td>
+                        <td>R$ {{ "%.2f"|format(v.falta) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-state">Nenhum resultado de vendedora lançado hoje.</p>
+    {% endif %}
+</div>
+
 <div class="cards-grid cards-grid-3">
     <div class="card destaque-card premium-destaque">
         <div class="destaque-titulo">Melhor farmácia do dia</div>

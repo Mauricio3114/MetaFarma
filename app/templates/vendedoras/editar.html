@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Vendedora | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Editar vendedora</h1>
+        <p>Atualize os dados da vendedora</p>
+    </div>
+</div>
+
+<div class="card form-card">
+    <form method="POST" class="form-grid">
+        <div class="form-group">
+            <label>Farmácia</label>
+            <select name="farmacia_id" required>
+                <option value="">Selecione</option>
+                {% for farmacia in farmacias %}
+                    <option value="{{ farmacia.id }}" {% if vendedora.farmacia_id == farmacia.id %}selected{% endif %}>
+                        {{ farmacia.nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Nome</label>
+            <input type="text" name="nome" value="{{ vendedora.nome }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Telefone</label>
+            <input type="text" name="telefone" value="{{ vendedora.telefone or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Status</label>
+            <select name="status">
+                <option value="ativa" {% if vendedora.status == 'ativa' %}selected{% endif %}>Ativa</option>
+                <option value="inativa" {% if vendedora.status == 'inativa' %}selected{% endif %}>Inativa</option>
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Observação</label>
+            <textarea name="observacao" rows="4">{{ vendedora.observacao or '' }}</textarea>
+        </div>
+
+        <div class="form-actions full-width">
+            <a href="{{ url_for('vendedoras.listar') }}" class="btn btn-secondary">Voltar</a>
+            <button type="submit" class="btn btn-primary">Atualizar vendedora</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

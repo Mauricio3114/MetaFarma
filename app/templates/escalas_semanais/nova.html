@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Nova Escala Semanal | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Nova escala semanal</h1>
+        <p>Defina a badge do dia e quantas vendedoras terão na manhã e na tarde</p>
+    </div>
+</div>
+
+<div class="card form-card">
+    <form method="POST" class="form-grid">
+        <div class="form-group">
+            <label>Farmácia</label>
+            <select name="farmacia_id" required>
+                <option value="">Selecione</option>
+                {% for farmacia in farmacias %}
+                    <option value="{{ farmacia.id }}">{{ farmacia.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Dia da semana</label>
+            <select name="dia_semana" required>
+                <option value="">Selecione</option>
+                {% for dia in dias_semana %}
+                    <option value="{{ dia }}">{{ dia }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Badge</label>
+            <select name="badge_id" required>
+                <option value="">Selecione</option>
+                {% for badge in badges %}
+                    <option value="{{ badge.id }}">
+                        {{ badge.nome }} | Manhã: R$ {{ "%.2f"|format(badge.valor_manha or 0) }} | Tarde: R$ {{ "%.2f"|format(badge.valor_tarde or 0) }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Quantidade de vendedoras na manhã</label>
+            <input type="number" name="quantidade_manha" min="0" value="0" required>
+        </div>
+
+        <div class="form-group">
+            <label>Quantidade de vendedoras na tarde</label>
+            <input type="number" name="quantidade_tarde" min="0" value="0" required>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Observação</label>
+            <textarea name="observacao" rows="4" placeholder="Ex: Sexta com folga, manhã fica só 1 pessoa..."></textarea>
+        </div>
+
+        <div class="form-actions full-width">
+            <a href="{{ url_for('escalas_semanais.listar') }}" class="btn btn-secondary">Voltar</a>
+            <button type="submit" class="btn btn-primary">Salvar escala</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -4,21 +4,20 @@ from app.models import Usuario
 app = create_app()
 
 with app.app_context():
-    db.create_all()
 
-    email = input("E-mail do admin: ").strip().lower()
-    nome = input("Nome do admin: ").strip()
-    senha = input("Senha do admin: ").strip()
+    # verifica se já existe
+    admin_existente = Usuario.query.filter_by(email="admin@metafarma.com").first()
 
-    existente = Usuario.query.filter_by(email=email).first()
-
-    if existente:
-        print("Já existe um usuário com esse e-mail.")
+    if admin_existente:
+        print("Admin já existe!")
     else:
-        usuario = Usuario(nome=nome, email=email, ativo=True)
-        usuario.set_senha(senha)
+        admin = Usuario(
+            nome="Administrador",
+            email="admin@metafarma.com"
+        )
+        admin.set_senha("123456")
 
-        db.session.add(usuario)
+        db.session.add(admin)
         db.session.commit()
 
-        print("Admin criado com sucesso.")
+        print("Admin criado com sucesso!")

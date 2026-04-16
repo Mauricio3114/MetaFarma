@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Escalas das Vendedoras | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Escalas das Vendedoras</h1>
+        <p>Defina quais vendedoras trabalham em cada dia e turno</p>
+    </div>
+
+    <a href="{{ url_for('escalas_vendedoras.nova') }}" class="btn btn-primary">+ Nova escala</a>
+</div>
+
+<div class="card">
+    <form method="GET" class="filter-bar filter-bar-4">
+        <select name="farmacia_id">
+            <option value="">Todas as farmácias</option>
+            {% for farmacia in farmacias %}
+                <option value="{{ farmacia.id }}" {% if farmacia_id == farmacia.id %}selected{% endif %}>
+                    {{ farmacia.nome }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="dia_semana">
+            <option value="">Todos os dias</option>
+            {% for dia in dias_semana %}
+                <option value="{{ dia }}" {% if dia_semana == dia %}selected{% endif %}>{{ dia }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="turno">
+            <option value="">Todos os turnos</option>
+            {% for t in turnos %}
+                <option value="{{ t }}" {% if turno == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="btn btn-secondary">Filtrar</button>
+    </form>
+</div>
+
+<div class="card">
+    {% if escalas %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Farmácia</th>
+                    <th>Dia</th>
+                    <th>Turno</th>
+                    <th>Vendedora</th>
+                    <th width="140">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for escala in escalas %}
+                <tr>
+                    <td>{{ escala.farmacia.nome }}</td>
+                    <td>{{ escala.dia_semana }}</td>
+                    <td><span class="badge badge-info">{{ escala.turno }}</span></td>
+                    <td>{{ escala.vendedora.nome }}</td>
+                    <td>
+                        <a href="{{ url_for('escalas_vendedoras.editar', escala_id=escala.id) }}" class="btn btn-small btn-secondary">Editar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="empty-state">Nenhuma escala de vendedora cadastrada ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}

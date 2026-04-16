@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Badge | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Editar badge de meta</h1>
+        <p>Atualize a cor e os valores por turno</p>
+    </div>
+</div>
+
+<div class="card form-card">
+    <form method="POST" class="form-grid">
+        <div class="form-group">
+            <label>Nome da badge</label>
+            <input type="text" name="nome" value="{{ badge.nome }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Cor</label>
+            <input type="color" name="cor_hex" value="{{ badge.cor_hex }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Valor da manhã (07:00 às 14:00)</label>
+            <input type="text" name="valor_manha" value="{{ badge.valor_manha or 0 }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Valor da tarde</label>
+            <input type="text" name="valor_tarde" value="{{ badge.valor_tarde or 0 }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Status</label>
+            <select name="status">
+                <option value="ativa" {% if badge.status == 'ativa' %}selected{% endif %}>Ativa</option>
+                <option value="inativa" {% if badge.status == 'inativa' %}selected{% endif %}>Inativa</option>
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Observação</label>
+            <textarea name="observacao" rows="4">{{ badge.observacao or '' }}</textarea>
+        </div>
+
+        <div class="form-actions full-width">
+            <a href="{{ url_for('badges.listar') }}" class="btn btn-secondary">Voltar</a>
+            <button type="submit" class="btn btn-primary">Atualizar badge</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

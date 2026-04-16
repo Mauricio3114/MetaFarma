@@ -4,7 +4,16 @@ from sqlalchemy import func
 from flask import Blueprint, render_template
 from flask_login import login_required
 
-from app.models import Equipe, Farmacia, Meta, Resultado
+from app.models import (
+    BadgeMeta,
+    Equipe,
+    EscalaSemanal,
+    EscalaVendedora,
+    Farmacia,
+    Meta,
+    Resultado,
+    ResultadoVendedora
+)
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
@@ -22,12 +31,26 @@ def calcular_percentual(realizado, meta):
     return round((realizado / meta) * 100, 1)
 
 
+def nome_dia_semana_pt(data_obj):
+    dias = {
+        0: "segunda",
+        1: "terca",
+        2: "quarta",
+        3: "quinta",
+        4: "sexta",
+        5: "sabado",
+        6: "domingo",
+    }
+    return dias.get(data_obj.weekday(), "")
+
+
 @dashboard_bp.route("/")
 @login_required
 def index():
     hoje = date.today()
     mes = hoje.month
     ano = hoje.year
+    dia_semana_hoje = nome_dia_semana_pt(hoje)
 
     total_farmacias = Farmacia.query.count()
     farmacias_ativas = Farmacia.query.filter_by(status="ativa").count()
@@ -119,6 +142,101 @@ def index():
     falta_turno2 = max(meta_turno2 - realizado_turno2, 0)
 
     # =========================
+    # ESCALA DO DIA ATUAL
+    # =========================
+    escalas_hoje = (
+        EscalaSemanal.query
+        .join(Farmacia)
+        .join(BadgeMeta)
+        .filter(EscalaSemanal.dia_semana == dia_semana_hoje)
+        .order_by(Farmacia.nome.asc())
+        .all()
+    )
+
+    # =========================
+    # PAINEL VENDEDORAS DO DIA
+    # =========================
+    painel_vendedoras_hoje = []
+    escalas_vendedoras_hoje = (
+        EscalaVendedora.query
+        .join(Farmacia)
+        .filter(EscalaVendedora.dia_semana == dia_semana_hoje)
+        .order_by(Farmacia.nome.asc(), EscalaVendedora.turno.asc(), EscalaVendedora.id.asc())
+        .all()
+    )
+
+    for escala_v in escalas_vendedoras_hoje:
+        escala_semana = EscalaSemanal.query.filter_by(
+            farmacia_id=escala_v.farmacia_id,
+            dia_semana=escala_v.dia_semana
+        ).first()
+
+        if not escala_semana:
+            continue
+
+        if escala_v.turno == "manha":
+            meta_individual = escala_semana.meta_individual_manha()
+            valor_turno = float(escala_semana.badge.valor_manha or 0)
+            quantidade_turno = int(escala_semana.quantidade_manha or 0)
+        else:
+            meta_individual = escala_semana.meta_individual_tarde()
+            valor_turno = float(escala_semana.badge.valor_tarde or 0)
+            quantidade_turno = int(escala_semana.quantidade_tarde or 0)
+
+        painel_vendedoras_hoje.append({
+            "farmacia_nome": escala_v.farmacia.nome,
+            "vendedora_nome": escala_v.vendedora.nome,
+            "dia_semana": escala_v.dia_semana,
+            "turno": escala_v.turno,
+            "badge_nome": escala_semana.badge.nome,
+            "badge_cor": escala_semana.badge.cor_hex,
+            "valor_turno": valor_turno,
+            "quantidade_turno": quantidade_turno,
+            "meta_individual": meta_individual,
+        })
+
+    # =========================
+    # RESULTADO POR VENDEDORA
+    # =========================
+    resultados_vendedoras = ResultadoVendedora.query.filter_by(data=hoje).all()
+
+    ranking_vendedoras = []
+
+    for r in resultados_vendedoras:
+        escala = EscalaSemanal.query.filter_by(
+            farmacia_id=r.farmacia_id,
+            dia_semana=dia_semana_hoje
+        ).first()
+
+        if not escala:
+            continue
+
+        if r.turno == "manha":
+            meta = escala.meta_individual_manha()
+        else:
+            meta = escala.meta_individual_tarde()
+
+        realizado = float(r.valor_realizado or 0)
+        percentual = (realizado / meta * 100) if meta > 0 else 0
+        falta = max(meta - realizado, 0)
+
+        ranking_vendedoras.append({
+            "nome": r.vendedora.nome,
+            "farmacia": r.farmacia.nome,
+            "turno": r.turno,
+            "meta": meta,
+            "realizado": realizado,
+            "percentual": round(percentual, 1),
+            "falta": falta
+        })
+
+    ranking_vendedoras = sorted(
+        ranking_vendedoras,
+        key=lambda x: x["realizado"],
+        reverse=True
+    )
+
+    # =========================
     # RANKING EQUIPES
     # =========================
     ranking_equipes = (
@@ -139,9 +257,6 @@ def index():
         .all()
     )
 
-    # =========================
-    # MELHOR EQUIPE DO DIA
-    # =========================
     melhor_equipe_dia = (
         Equipe.query
         .join(Resultado, Resultado.equipe_id == Equipe.id)
@@ -159,9 +274,6 @@ def index():
         .first()
     )
 
-    # =========================
-    # RANKING FARMÁCIAS
-    # =========================
     ranking_farmacias = (
         Farmacia.query
         .outerjoin(Resultado, Resultado.farmacia_id == Farmacia.id)
@@ -177,9 +289,6 @@ def index():
         .all()
     )
 
-    # =========================
-    # MELHOR FARMÁCIA DO DIA
-    # =========================
     melhor_farmacia_dia = (
         Farmacia.query
         .join(Resultado, Resultado.farmacia_id == Farmacia.id)
@@ -194,9 +303,6 @@ def index():
         .first()
     )
 
-    # =========================
-    # PIOR DESEMPENHO DO DIA
-    # =========================
     pior_desempenho_dia = (
         Equipe.query
         .join(Resultado, Resultado.equipe_id == Equipe.id)
@@ -268,9 +374,6 @@ def index():
     grafico_farmacias_meta = [item["meta_mes"] for item in comparativo_farmacias[:6]]
     grafico_farmacias_realizado = [item["realizado_mes"] for item in comparativo_farmacias[:6]]
 
-    # =========================
-    # GRÁFICO PIZZA FARMÁCIAS
-    # =========================
     grafico_pizza_labels = []
     grafico_pizza_valores = []
 
@@ -278,9 +381,6 @@ def index():
         grafico_pizza_labels.append(item["farmacia_nome"] or "Sem nome")
         grafico_pizza_valores.append(float(item["realizado_mes"] or 0))
 
-    # =========================
-    # Últimos dados
-    # =========================
     ultimos_resultados = (
         Resultado.query
         .order_by(Resultado.data_resultado.desc(), Resultado.id.desc())
@@ -330,6 +430,11 @@ def index():
         realizado_turno2=realizado_turno2,
         perc_turno2=perc_turno2,
         falta_turno2=falta_turno2,
+
+        dia_semana_hoje=dia_semana_hoje,
+        escalas_hoje=escalas_hoje,
+        painel_vendedoras_hoje=painel_vendedoras_hoje,
+        ranking_vendedoras=ranking_vendedoras,
 
         ranking_equipes=ranking_equipes,
         ranking_farmacias=ranking_farmacias,
