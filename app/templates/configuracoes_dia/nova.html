@@ -1,12 +1,10 @@
 {% extends "base.html" %}
-
-{% block title %}Nova Escala de Vendedora | MetaFarma{% endblock %}
-
+{% block title %}Nova Configuração | MetaFarma{% endblock %}
 {% block content %}
 <div class="page-header">
     <div>
-        <h1>Nova escala de vendedora</h1>
-        <p>Defina a vendedora e o turno fixo</p>
+        <h1>Nova configuração de dia</h1>
+        <p>Escolha a farmácia, o tipo do dia e a badge</p>
     </div>
 </div>
 
@@ -23,30 +21,22 @@
         </div>
 
         <div class="form-group">
-            <label>Vendedora</label>
-            <select name="vendedora_id" required>
+            <label>Tipo do dia</label>
+            <select name="tipo_dia" required>
                 <option value="">Selecione</option>
-                {% for vendedora in vendedoras %}
-                    <option value="{{ vendedora.id }}">{{ vendedora.nome }} - {{ vendedora.farmacia.nome }}</option>
+                {% for tipo in tipos_dia %}
+                    <option value="{{ tipo }}">{{ tipo }}</option>
                 {% endfor %}
             </select>
         </div>
 
-        <div class="form-group">
-            <label>Turno</label>
-            <select name="turno" required>
+        <div class="form-group full-width">
+            <label>Badge</label>
+            <select name="badge_id" required>
                 <option value="">Selecione</option>
-                {% for t in turnos %}
-                    <option value="{{ t }}">{{ t }}</option>
+                {% for badge in badges %}
+                    <option value="{{ badge.id }}">{{ badge.nome }} | Manhã R$ {{ "%.2f"|format(badge.valor_manha or 0) }} | Tarde R$ {{ "%.2f"|format(badge.valor_tarde or 0) }}</option>
                 {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Status</label>
-            <select name="status">
-                <option value="ativa">Ativa</option>
-                <option value="inativa">Inativa</option>
             </select>
         </div>
 
@@ -56,8 +46,8 @@
         </div>
 
         <div class="form-actions full-width">
-            <a href="{{ url_for('escalas_vendedoras.listar') }}" class="btn btn-secondary">Voltar</a>
-            <button type="submit" class="btn btn-primary">Salvar escala</button>
+            <a href="{{ url_for('configuracoes_dia.listar') }}" class="btn btn-secondary">Voltar</a>
+            <button type="submit" class="btn btn-primary">Salvar</button>
         </div>
     </form>
 </div>

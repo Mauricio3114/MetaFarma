@@ -6,18 +6,20 @@
 <div class="page-header">
     <div>
         <h1>Editar escala de vendedora</h1>
-        <p>Atualize os dados da escala</p>
+        <p>Atualize a vendedora e o turno fixo</p>
     </div>
 </div>
 
 <div class="card form-card">
     <form method="POST" class="form-grid">
+        
         <div class="form-group">
             <label>Farmácia</label>
             <select name="farmacia_id" required>
                 <option value="">Selecione</option>
                 {% for farmacia in farmacias %}
-                    <option value="{{ farmacia.id }}" {% if escala.farmacia_id == farmacia.id %}selected{% endif %}>
+                    <option value="{{ farmacia.id }}"
+                        {% if farmacia.id == escala.farmacia_id %}selected{% endif %}>
                         {{ farmacia.nome }}
                     </option>
                 {% endfor %}
@@ -29,19 +31,10 @@
             <select name="vendedora_id" required>
                 <option value="">Selecione</option>
                 {% for vendedora in vendedoras %}
-                    <option value="{{ vendedora.id }}" {% if escala.vendedora_id == vendedora.id %}selected{% endif %}>
+                    <option value="{{ vendedora.id }}"
+                        {% if vendedora.id == escala.vendedora_id %}selected{% endif %}>
                         {{ vendedora.nome }} - {{ vendedora.farmacia.nome }}
                     </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Dia da semana</label>
-            <select name="dia_semana" required>
-                <option value="">Selecione</option>
-                {% for dia in dias_semana %}
-                    <option value="{{ dia }}" {% if escala.dia_semana == dia %}selected{% endif %}>{{ dia }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -51,20 +44,32 @@
             <select name="turno" required>
                 <option value="">Selecione</option>
                 {% for t in turnos %}
-                    <option value="{{ t }}" {% if escala.turno == t %}selected{% endif %}>{{ t }}</option>
+                    <option value="{{ t }}"
+                        {% if t == escala.turno %}selected{% endif %}>
+                        {{ t }}
+                    </option>
                 {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Status</label>
+            <select name="status">
+                <option value="ativa" {% if escala.status == "ativa" %}selected{% endif %}>Ativa</option>
+                <option value="inativa" {% if escala.status == "inativa" %}selected{% endif %}>Inativa</option>
             </select>
         </div>
 
         <div class="form-group full-width">
             <label>Observação</label>
-            <textarea name="observacao" rows="4">{{ escala.observacao or '' }}</textarea>
+            <textarea name="observacao" rows="4">{{ escala.observacao or "" }}</textarea>
         </div>
 
         <div class="form-actions full-width">
             <a href="{{ url_for('escalas_vendedoras.listar') }}" class="btn btn-secondary">Voltar</a>
-            <button type="submit" class="btn btn-primary">Atualizar escala</button>
+            <button type="submit" class="btn btn-primary">Salvar alterações</button>
         </div>
+
     </form>
 </div>
 {% endblock %}

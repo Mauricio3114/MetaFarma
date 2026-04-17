@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Feriados | MetaFarma{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Feriados</h1>
+        <p>Cadastre datas que devem usar a badge de feriado</p>
+    </div>
+    <a href="{{ url_for('feriados.novo') }}" class="btn btn-primary">+ Novo feriado</a>
+</div>
+
+<div class="card">
+    {% if feriados %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Farmácia</th>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in feriados %}
+                <tr>
+                    <td>{{ item.farmacia.nome }}</td>
+                    <td>{{ item.data.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ item.descricao }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty-state">Nenhum feriado cadastrado.</p>
+    {% endif %}
+</div>
+{% endblock %}

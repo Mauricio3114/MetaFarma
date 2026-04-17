@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -17,7 +17,6 @@ def agora_brasil():
             return datetime.now(ZoneInfo("America/Fortaleza"))
     except Exception:
         pass
-
     return datetime.now()
 
 
@@ -55,10 +54,11 @@ class Farmacia(db.Model):
 
     metas = db.relationship("Meta", backref="farmacia", lazy=True, cascade="all, delete-orphan")
     equipes = db.relationship("Equipe", backref="farmacia", lazy=True, cascade="all, delete-orphan")
-    resultados = db.relationship("Resultado", backref="farmacia", lazy=True, cascade="all, delete-orphan")
     vendedoras = db.relationship("Vendedora", backref="farmacia", lazy=True, cascade="all, delete-orphan")
-    escalas_semanais = db.relationship("EscalaSemanal", backref="farmacia", lazy=True, cascade="all, delete-orphan")
+    configuracoes_dia = db.relationship("ConfiguracaoDia", backref="farmacia", lazy=True, cascade="all, delete-orphan")
     escalas_vendedoras = db.relationship("EscalaVendedora", backref="farmacia", lazy=True, cascade="all, delete-orphan")
+    calendarios_vendedoras = db.relationship("CalendarioVendedora", backref="farmacia", lazy=True, cascade="all, delete-orphan")
+    feriados = db.relationship("Feriado", backref="farmacia", lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Farmacia {self.nome}>"
@@ -69,14 +69,11 @@ class Meta(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     farmacia_id = db.Column(db.Integer, db.ForeignKey("farmacias.id"), nullable=False, index=True)
-
     tipo = db.Column(db.String(20), nullable=False, index=True)
     valor_meta = db.Column(db.Float, default=0)
     pedidos_meta = db.Column(db.Integer, default=0)
-
     data_inicio = db.Column(db.Date, nullable=True)
     data_fim = db.Column(db.Date, nullable=True)
-
     observacao = db.Column(db.String(255), nullable=True)
     criado_em = db.Column(db.DateTime, default=agora_brasil)
 
@@ -89,7 +86,6 @@ class Equipe(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     farmacia_id = db.Column(db.Integer, db.ForeignKey("farmacias.id"), nullable=False, index=True)
-
     nome = db.Column(db.String(120), nullable=False)
     turno = db.Column(db.String(20), nullable=False, index=True)
     responsavel = db.Column(db.String(120), nullable=True)
@@ -97,31 +93,26 @@ class Equipe(db.Model):
     observacao = db.Column(db.String(255), nullable=True)
     criado_em = db.Column(db.DateTime, default=agora_brasil)
 
-    resultados = db.relationship("Resultado", backref="equipe", lazy=True)
-
     def __repr__(self):
         return f"<Equipe {self.nome} - {self.turno}>"
 
 
-class Resultado(db.Model):
-    __tablename__ = "resultados"
+class Vendedora(db.Model):
+    __tablename__ = "vendedoras"
 
     id = db.Column(db.Integer, primary_key=True)
-
     farmacia_id = db.Column(db.Integer, db.ForeignKey("farmacias.id"), nullable=False, index=True)
-    equipe_id = db.Column(db.Integer, db.ForeignKey("equipes.id"), nullable=False, index=True)
-
-    data_resultado = db.Column(db.Date, nullable=False, index=True)
-    turno = db.Column(db.String(20), nullable=False, index=True)
-
-    valor_realizado = db.Column(db.Float, default=0)
-    pedidos_realizados = db.Column(db.Integer, default=0)
-
+    nome = db.Column(db.String(120), nullable=False)
+    telefone = db.Column(db.String(30), nullable=True)
+    status = db.Column(db.String(20), default="ativa")
     observacao = db.Column(db.String(255), nullable=True)
     criado_em = db.Column(db.DateTime, default=agora_brasil)
 
+    escalas = db.relationship("EscalaVendedora", backref="vendedora", lazy=True, cascade="all, delete-orphan")
+    calendarios = db.relationship("CalendarioVendedora", backref="vendedora", lazy=True, cascade="all, delete-orphan")
+
     def __repr__(self):
-        return f"<Resultado {self.data_resultado} - {self.turno}>"
+        return f"<Vendedora {self.nome}>"
 
 
 class BadgeMeta(db.Model):
@@ -140,57 +131,20 @@ class BadgeMeta(db.Model):
         return f"<BadgeMeta {self.nome}>"
 
 
-class Vendedora(db.Model):
-    __tablename__ = "vendedoras"
+class ConfiguracaoDia(db.Model):
+    __tablename__ = "configuracoes_dia"
 
     id = db.Column(db.Integer, primary_key=True)
     farmacia_id = db.Column(db.Integer, db.ForeignKey("farmacias.id"), nullable=False, index=True)
-
-    nome = db.Column(db.String(120), nullable=False)
-    telefone = db.Column(db.String(30), nullable=True)
-    status = db.Column(db.String(20), default="ativa")
-    observacao = db.Column(db.String(255), nullable=True)
-    criado_em = db.Column(db.DateTime, default=agora_brasil)
-
-    escalas = db.relationship("EscalaVendedora", backref="vendedora", lazy=True, cascade="all, delete-orphan")
-
-    def __repr__(self):
-        return f"<Vendedora {self.nome}>"
-
-
-class EscalaSemanal(db.Model):
-    __tablename__ = "escalas_semanais"
-
-    id = db.Column(db.Integer, primary_key=True)
-    farmacia_id = db.Column(db.Integer, db.ForeignKey("farmacias.id"), nullable=False, index=True)
-
-    dia_semana = db.Column(db.String(20), nullable=False, index=True)
+    tipo_dia = db.Column(db.String(20), nullable=False, index=True)  # segunda...domingo, feriado
     badge_id = db.Column(db.Integer, db.ForeignKey("badges_meta.id"), nullable=False)
-
-    quantidade_manha = db.Column(db.Integer, default=0)
-    quantidade_tarde = db.Column(db.Integer, default=0)
-
     observacao = db.Column(db.String(255), nullable=True)
     criado_em = db.Column(db.DateTime, default=agora_brasil)
 
-    badge = db.relationship("BadgeMeta", backref="escalas_semanais")
-
-    def meta_individual_manha(self):
-        valor = float(self.badge.valor_manha or 0) if self.badge else 0.0
-        qtd = int(self.quantidade_manha or 0)
-        if qtd <= 0:
-            return 0.0
-        return valor / qtd
-
-    def meta_individual_tarde(self):
-        valor = float(self.badge.valor_tarde or 0) if self.badge else 0.0
-        qtd = int(self.quantidade_tarde or 0)
-        if qtd <= 0:
-            return 0.0
-        return valor / qtd
+    badge = db.relationship("BadgeMeta", backref="configuracoes_dia")
 
     def __repr__(self):
-        return f"<EscalaSemanal {self.dia_semana} - Farmacia {self.farmacia_id}>"
+        return f"<ConfiguracaoDia {self.tipo_dia} - Farmacia {self.farmacia_id}>"
 
 
 class EscalaVendedora(db.Model):
@@ -199,34 +153,39 @@ class EscalaVendedora(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     farmacia_id = db.Column(db.Integer, db.ForeignKey("farmacias.id"), nullable=False, index=True)
     vendedora_id = db.Column(db.Integer, db.ForeignKey("vendedoras.id"), nullable=False, index=True)
-
-    dia_semana = db.Column(db.String(20), nullable=False, index=True)
     turno = db.Column(db.String(20), nullable=False, index=True)  # manha / tarde
-
+    status = db.Column(db.String(20), default="ativa")
     observacao = db.Column(db.String(255), nullable=True)
     criado_em = db.Column(db.DateTime, default=agora_brasil)
 
     def __repr__(self):
-        return f"<EscalaVendedora {self.dia_semana} - {self.turno}>"
-    
-class ResultadoVendedora(db.Model):
-    __tablename__ = "resultados_vendedoras"
+        return f"<EscalaVendedora {self.vendedora.nome} - {self.turno}>"
+
+
+class CalendarioVendedora(db.Model):
+    __tablename__ = "calendarios_vendedoras"
 
     id = db.Column(db.Integer, primary_key=True)
-
-    farmacia_id = db.Column(db.Integer, db.ForeignKey("farmacias.id"), nullable=False)
-    vendedora_id = db.Column(db.Integer, db.ForeignKey("vendedoras.id"), nullable=False)
-
-    data = db.Column(db.Date, nullable=False)
-    turno = db.Column(db.String(20), nullable=False)
-
-    valor_realizado = db.Column(db.Float, default=0)
-    pedidos = db.Column(db.Integer, default=0)
-
+    farmacia_id = db.Column(db.Integer, db.ForeignKey("farmacias.id"), nullable=False, index=True)
+    vendedora_id = db.Column(db.Integer, db.ForeignKey("vendedoras.id"), nullable=False, index=True)
+    data = db.Column(db.Date, nullable=False, index=True)
+    trabalha = db.Column(db.Boolean, default=True)
+    turno_dia = db.Column(db.String(20), default="fixo")  # fixo / manha / tarde
+    observacao = db.Column(db.String(255), nullable=True)
     criado_em = db.Column(db.DateTime, default=agora_brasil)
 
-    farmacia = db.relationship("Farmacia")
-    vendedora = db.relationship("Vendedora")
+    def __repr__(self):
+        return f"<CalendarioVendedora {self.vendedora.nome} - {self.data}>"
+
+
+class Feriado(db.Model):
+    __tablename__ = "feriados"
+
+    id = db.Column(db.Integer, primary_key=True)
+    farmacia_id = db.Column(db.Integer, db.ForeignKey("farmacias.id"), nullable=False, index=True)
+    data = db.Column(db.Date, nullable=False, index=True)
+    descricao = db.Column(db.String(150), nullable=False)
+    criado_em = db.Column(db.DateTime, default=agora_brasil)
 
     def __repr__(self):
-        return f"<ResultadoVendedora {self.vendedora_id} {self.data}>"
+        return f"<Feriado {self.data} - {self.descricao}>"

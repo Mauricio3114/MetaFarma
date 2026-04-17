@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Tipos de Dia | MetaFarma{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Tipos de dia</h1>
+        <p>Defina qual badge vale para segunda, terça... e feriado</p>
+    </div>
+    <a href="{{ url_for('configuracoes_dia.nova') }}" class="btn btn-primary">+ Nova configuração</a>
+</div>
+
+<div class="card">
+    {% if configuracoes %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Farmácia</th>
+                    <th>Tipo do dia</th>
+                    <th>Badge</th>
+                    <th>Manhã</th>
+                    <th>Tarde</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in configuracoes %}
+                <tr>
+                    <td>{{ item.farmacia.nome }}</td>
+                    <td>{{ item.tipo_dia }}</td>
+                    <td>
+                        <span class="badge" style="background: {{ item.badge.cor_hex }}; color: #fff;">
+                            {{ item.badge.nome }}
+                        </span>
+                    </td>
+                    <td>R$ {{ "%.2f"|format(item.badge.valor_manha or 0) }}</td>
+                    <td>R$ {{ "%.2f"|format(item.badge.valor_tarde or 0) }}</td>
+                    <td><a href="{{ url_for('configuracoes_dia.editar', config_id=item.id) }}" class="btn btn-small btn-secondary">Editar</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty-state">Nenhuma configuração cadastrada.</p>
+    {% endif %}
+</div>
+{% endblock %}

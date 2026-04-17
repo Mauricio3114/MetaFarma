@@ -6,171 +6,71 @@
 <div class="page-header premium-header">
     <div>
         <h1>Dashboard</h1>
-        <p>Visão geral estratégica do sistema MetaFarma</p>
+        <p>Painel de metas, escalas e calendário mensal</p>
     </div>
 </div>
 
-<div class="cards-grid cards-grid-6">
+<div class="card">
+    <form method="GET" class="filter-bar filter-bar-4">
+        <select name="farmacia_id" required>
+            <option value="">Selecione a farmácia</option>
+            {% for farmacia in farmacias %}
+                <option value="{{ farmacia.id }}" {% if farmacia_id == farmacia.id %}selected{% endif %}>
+                    {{ farmacia.nome }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <input type="number" name="mes" min="1" max="12" value="{{ mes }}">
+        <input type="number" name="ano" min="2024" max="2100" value="{{ ano }}">
+
+        <button type="submit" class="btn btn-primary">Aplicar</button>
+    </form>
+</div>
+
+<div class="cards-grid cards-grid-4">
     <div class="card kpi-card premium-kpi">
         <span class="kpi-label">Total de farmácias</span>
         <h2>{{ total_farmacias }}</h2>
     </div>
 
     <div class="card kpi-card premium-kpi">
-        <span class="kpi-label">Farmácias ativas</span>
-        <h2>{{ farmacias_ativas }}</h2>
+        <span class="kpi-label">Total de vendedoras</span>
+        <h2>{{ total_vendedoras }}</h2>
     </div>
 
     <div class="card kpi-card premium-kpi">
-        <span class="kpi-label">Metas cadastradas</span>
-        <h2>{{ total_metas }}</h2>
+        <span class="kpi-label">Configurações de dia</span>
+        <h2>{{ total_badges_configuradas }}</h2>
     </div>
 
     <div class="card kpi-card premium-kpi">
-        <span class="kpi-label">Equipes cadastradas</span>
-        <h2>{{ total_equipes }}</h2>
-    </div>
-
-    <div class="card kpi-card premium-kpi">
-        <span class="kpi-label">Resultados lançados</span>
-        <h2>{{ total_resultados }}</h2>
-    </div>
-
-    <div class="card kpi-card premium-kpi kpi-money">
-        <span class="kpi-label">Valor realizado</span>
-        <h2>R$ {{ "%.2f"|format(total_valor_realizado) }}</h2>
+        <span class="kpi-label">Escalas fixas</span>
+        <h2>{{ total_escalas }}</h2>
     </div>
 </div>
 
-<div class="cards-grid cards-grid-4">
-    <div class="card indicador-card premium-indicador">
-        <div class="indicador-topo">
-            <h3>Meta do dia</h3>
-            {% if perc_dia >= 100 %}
-                <span class="status-chip status-ok">Bateu</span>
-            {% elif perc_dia >= 70 %}
-                <span class="status-chip status-warning">Atenção</span>
-            {% else %}
-                <span class="status-chip status-danger blink-soft">Grave</span>
-            {% endif %}
-        </div>
-
-        <div class="valor-meta">R$ {{ "%.2f"|format(meta_diaria) }}</div>
-        <div class="meta-subinfo">
-            <span>Realizado: <strong>R$ {{ "%.2f"|format(realizado_dia) }}</strong></span>
-            <span>Falta: <strong>R$ {{ "%.2f"|format(falta_dia) }}</strong></span>
-        </div>
-
-        <div class="progress-area">
-            <div class="progress-top">
-                <span>Atingido</span>
-                <strong>{{ perc_dia }}%</strong>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill {% if perc_dia >= 100 %}progress-ok{% elif perc_dia >= 70 %}progress-warning{% else %}progress-danger{% endif %}"
-                     style="width: {{ 100 if perc_dia > 100 else perc_dia }}%;">
-                </div>
-            </div>
-        </div>
+{% if farmacia_atual %}
+<div class="cards-grid cards-grid-3 mt-20">
+    <div class="card kpi-card premium-kpi">
+        <span class="kpi-label">Farmácia selecionada</span>
+        <h2 style="font-size: 22px;">{{ farmacia_atual.nome }}</h2>
     </div>
 
-    <div class="card indicador-card premium-indicador">
-        <div class="indicador-topo">
-            <h3>Meta do mês</h3>
-            {% if perc_mes >= 100 %}
-                <span class="status-chip status-ok">Bateu</span>
-            {% elif perc_mes >= 70 %}
-                <span class="status-chip status-warning">Atenção</span>
-            {% else %}
-                <span class="status-chip status-danger blink-soft">Grave</span>
-            {% endif %}
-        </div>
-
-        <div class="valor-meta">R$ {{ "%.2f"|format(meta_mensal) }}</div>
-        <div class="meta-subinfo">
-            <span>Realizado: <strong>R$ {{ "%.2f"|format(realizado_mes) }}</strong></span>
-            <span>Falta: <strong>R$ {{ "%.2f"|format(falta_mes) }}</strong></span>
-        </div>
-
-        <div class="progress-area">
-            <div class="progress-top">
-                <span>Atingido</span>
-                <strong>{{ perc_mes }}%</strong>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill {% if perc_mes >= 100 %}progress-ok{% elif perc_mes >= 70 %}progress-warning{% else %}progress-danger{% endif %}"
-                     style="width: {{ 100 if perc_mes > 100 else perc_mes }}%;">
-                </div>
-            </div>
-        </div>
+    <div class="card kpi-card premium-kpi">
+        <span class="kpi-label">Dias trabalhados no mês</span>
+        <h2>{{ total_dias_trabalhados_mes }}</h2>
     </div>
 
-    <div class="card indicador-card premium-indicador">
-        <div class="indicador-topo">
-            <h3>Turno 1</h3>
-            {% if perc_turno1 >= 100 %}
-                <span class="status-chip status-ok">Bateu</span>
-            {% elif perc_turno1 >= 70 %}
-                <span class="status-chip status-warning">Atenção</span>
-            {% else %}
-                <span class="status-chip status-danger blink-soft">Grave</span>
-            {% endif %}
-        </div>
-
-        <div class="valor-meta">R$ {{ "%.2f"|format(meta_turno1) }}</div>
-        <div class="meta-subinfo">
-            <span>Realizado: <strong>R$ {{ "%.2f"|format(realizado_turno1) }}</strong></span>
-            <span>Falta: <strong>R$ {{ "%.2f"|format(falta_turno1) }}</strong></span>
-        </div>
-
-        <div class="progress-area">
-            <div class="progress-top">
-                <span>Atingido</span>
-                <strong>{{ perc_turno1 }}%</strong>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill {% if perc_turno1 >= 100 %}progress-ok{% elif perc_turno1 >= 70 %}progress-warning{% else %}progress-danger{% endif %}"
-                     style="width: {{ 100 if perc_turno1 > 100 else perc_turno1 }}%;">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card indicador-card premium-indicador">
-        <div class="indicador-topo">
-            <h3>Turno 2</h3>
-            {% if perc_turno2 >= 100 %}
-                <span class="status-chip status-ok">Bateu</span>
-            {% elif perc_turno2 >= 70 %}
-                <span class="status-chip status-warning">Atenção</span>
-            {% else %}
-                <span class="status-chip status-danger blink-soft">Grave</span>
-            {% endif %}
-        </div>
-
-        <div class="valor-meta">R$ {{ "%.2f"|format(meta_turno2) }}</div>
-        <div class="meta-subinfo">
-            <span>Realizado: <strong>R$ {{ "%.2f"|format(realizado_turno2) }}</strong></span>
-            <span>Falta: <strong>R$ {{ "%.2f"|format(falta_turno2) }}</strong></span>
-        </div>
-
-        <div class="progress-area">
-            <div class="progress-top">
-                <span>Atingido</span>
-                <strong>{{ perc_turno2 }}%</strong>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill {% if perc_turno2 >= 100 %}progress-ok{% elif perc_turno2 >= 70 %}progress-warning{% else %}progress-danger{% endif %}"
-                     style="width: {{ 100 if perc_turno2 > 100 else perc_turno2 }}%;">
-                </div>
-            </div>
-        </div>
+    <div class="card kpi-card premium-kpi">
+        <span class="kpi-label">Meta mensal somada</span>
+        <h2>R$ {{ "%.2f"|format(total_meta_mensal_vendedoras) }}</h2>
     </div>
 </div>
 
 <div class="card mt-20 premium-table-card">
     <div class="card-header">
-        <h3>Escala do dia atual — {{ dia_semana_hoje }}</h3>
+        <h3>Escala do dia atual — {{ hoje.strftime('%d/%m/%Y') }}</h3>
     </div>
 
     {% if escalas_hoje %}
@@ -178,688 +78,213 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Farmácia</th>
+                        <th>Tipo do dia</th>
                         <th>Badge</th>
                         <th>Valor manhã</th>
-                        <th>Qtde manhã</th>
+                        <th>Qtd manhã</th>
                         <th>Meta indiv. manhã</th>
                         <th>Valor tarde</th>
-                        <th>Qtde tarde</th>
+                        <th>Qtd tarde</th>
                         <th>Meta indiv. tarde</th>
+                        <th>Feriado</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for escala in escalas_hoje %}
+                    {% for item in escalas_hoje %}
                     <tr>
-                        <td>{{ escala.farmacia.nome }}</td>
+                        <td>{{ item.tipo_dia }}</td>
                         <td>
-                            <span class="badge" style="background: {{ escala.badge.cor_hex }}; color: #ffffff;">
-                                {{ escala.badge.nome }}
+                            <span class="badge" style="background: {{ item.badge_cor }}; color: #fff;">
+                                {{ item.badge_nome }}
                             </span>
                         </td>
-                        <td>R$ {{ "%.2f"|format(escala.badge.valor_manha or 0) }}</td>
-                        <td>{{ escala.quantidade_manha or 0 }}</td>
-                        <td>R$ {{ "%.2f"|format(escala.meta_individual_manha()) }}</td>
-                        <td>R$ {{ "%.2f"|format(escala.badge.valor_tarde or 0) }}</td>
-                        <td>{{ escala.quantidade_tarde or 0 }}</td>
-                        <td>R$ {{ "%.2f"|format(escala.meta_individual_tarde()) }}</td>
+                        <td>R$ {{ "%.2f"|format(item.valor_manha) }}</td>
+                        <td>{{ item.qtd_manha }}</td>
+                        <td>R$ {{ "%.2f"|format(item.meta_individual_manha) }}</td>
+                        <td>R$ {{ "%.2f"|format(item.valor_tarde) }}</td>
+                        <td>{{ item.qtd_tarde }}</td>
+                        <td>R$ {{ "%.2f"|format(item.meta_individual_tarde) }}</td>
+                        <td>{{ item.feriado_descricao or "-" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     {% else %}
-        <p class="empty-state">Nenhuma escala cadastrada para hoje.</p>
+        <p class="empty-state">Sem configuração para hoje.</p>
     {% endif %}
 </div>
 
 <div class="card mt-20 premium-table-card">
     <div class="card-header">
-        <h3>Vendedoras do dia atual — {{ dia_semana_hoje }}</h3>
+        <h3>Quem trabalha hoje</h3>
     </div>
 
-    {% if painel_vendedoras_hoje %}
+    {% if painel_hoje %}
         <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
-                        <th>Farmácia</th>
                         <th>Vendedora</th>
                         <th>Turno</th>
                         <th>Badge</th>
                         <th>Valor do turno</th>
-                        <th>Qtde no turno</th>
+                        <th>Qtd no turno</th>
                         <th>Meta individual</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for item in painel_vendedoras_hoje %}
+                    {% for item in painel_hoje %}
                     <tr>
-                        <td>{{ item.farmacia_nome }}</td>
-                        <td>{{ item.vendedora_nome }}</td>
+                        <td>{{ item.nome }}</td>
                         <td><span class="badge badge-info">{{ item.turno }}</span></td>
                         <td>
-                            <span class="badge" style="background: {{ item.badge_cor }}; color: #ffffff;">
+                            <span class="badge" style="background: {{ item.badge_cor }}; color: #fff;">
                                 {{ item.badge_nome }}
                             </span>
                         </td>
-                        <td>R$ {{ "%.2f"|format(item.valor_turno or 0) }}</td>
-                        <td>{{ item.quantidade_turno or 0 }}</td>
-                        <td><strong>R$ {{ "%.2f"|format(item.meta_individual or 0) }}</strong></td>
+                        <td>R$ {{ "%.2f"|format(item.valor_turno) }}</td>
+                        <td>{{ item.qtd_turno }}</td>
+                        <td><strong>R$ {{ "%.2f"|format(item.meta_individual) }}</strong></td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     {% else %}
-        <p class="empty-state">Nenhuma vendedora escalada para hoje.</p>
+        <p class="empty-state">Nenhuma vendedora marcada para hoje.</p>
     {% endif %}
 </div>
 
 <div class="card mt-20 premium-table-card">
     <div class="card-header">
-        <h3>Ranking das Vendedoras (Hoje)</h3>
+        <h3>Resumo mensal por vendedora — {{ "%02d"|format(mes) }}/{{ ano }}</h3>
     </div>
 
-    {% if ranking_vendedoras %}
+    {% if resumo_vendedoras_mes %}
         <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
                         <th>#</th>
                         <th>Vendedora</th>
-                        <th>Farmácia</th>
                         <th>Turno</th>
-                        <th>Meta</th>
-                        <th>Realizado</th>
-                        <th>%</th>
-                        <th>Falta</th>
+                        <th>Dias trabalhados</th>
+                        <th>Meta mensal</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for v in ranking_vendedoras %}
+                    {% for item in resumo_vendedoras_mes %}
                     <tr>
                         <td>{{ loop.index }}</td>
-                        <td>{{ v.nome }}</td>
-                        <td>{{ v.farmacia }}</td>
-                        <td>{{ v.turno }}</td>
-                        <td>R$ {{ "%.2f"|format(v.meta) }}</td>
-                        <td>R$ {{ "%.2f"|format(v.realizado) }}</td>
-                        <td>
-                            <span class="
-                                badge
-                                {% if v.percentual >= 100 %}badge-success
-                                {% elif v.percentual >= 70 %}badge-info
-                                {% else %}badge-danger blink-soft
-                                {% endif %}
-                            ">
-                                {{ v.percentual }}%
-                            </span>
-                        </td>
-                        <td>R$ {{ "%.2f"|format(v.falta) }}</td>
+                        <td>{{ item.nome }}</td>
+                        <td><span class="badge badge-info">{{ item.turno }}</span></td>
+                        <td>{{ item.dias_trabalhados }}</td>
+                        <td><strong>R$ {{ "%.2f"|format(item.meta_total) }}</strong></td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     {% else %}
-        <p class="empty-state">Nenhum resultado de vendedora lançado hoje.</p>
+        <p class="empty-state">Nenhuma meta mensal calculada ainda. Marca os dias no calendário mensal.</p>
     {% endif %}
-</div>
-
-<div class="cards-grid cards-grid-3">
-    <div class="card destaque-card premium-destaque">
-        <div class="destaque-titulo">Melhor farmácia do dia</div>
-        {% if melhor_farmacia_dia %}
-            <div class="destaque-principal">{{ melhor_farmacia_dia.farmacia_nome }}</div>
-            <p><strong>Valor:</strong> R$ {{ "%.2f"|format(melhor_farmacia_dia.total_valor or 0) }}</p>
-            <p><strong>Pedidos:</strong> {{ melhor_farmacia_dia.total_pedidos or 0 }}</p>
-        {% else %}
-            <p class="empty-state">Sem dados hoje.</p>
-        {% endif %}
-    </div>
-
-    <div class="card destaque-card premium-destaque">
-        <div class="destaque-titulo">Melhor equipe do dia</div>
-        {% if melhor_equipe_dia %}
-            <div class="destaque-principal">{{ melhor_equipe_dia.equipe_nome }}</div>
-            <p><strong>Farmácia:</strong> {{ melhor_equipe_dia.farmacia_nome }}</p>
-            <p><strong>Turno:</strong> {{ melhor_equipe_dia.turno }}</p>
-            <p><strong>Valor:</strong> R$ {{ "%.2f"|format(melhor_equipe_dia.total_valor or 0) }}</p>
-        {% else %}
-            <p class="empty-state">Sem dados hoje.</p>
-        {% endif %}
-    </div>
-
-    <div class="card destaque-card premium-destaque danger-outline">
-        <div class="destaque-titulo">Pior desempenho do dia</div>
-        {% if pior_desempenho_dia %}
-            <div class="destaque-principal">{{ pior_desempenho_dia.equipe_nome }}</div>
-            <p><strong>Farmácia:</strong> {{ pior_desempenho_dia.farmacia_nome }}</p>
-            <p><strong>Turno:</strong> {{ pior_desempenho_dia.turno }}</p>
-            <p><strong>Valor:</strong> R$ {{ "%.2f"|format(pior_desempenho_dia.total_valor or 0) }}</p>
-        {% else %}
-            <p class="empty-state">Sem dados hoje.</p>
-        {% endif %}
-    </div>
-</div>
-
-<div class="charts-grid">
-    <div class="card chart-card">
-        <div class="card-header">
-            <h3>Meta x Realizado</h3>
-        </div>
-        <canvas id="graficoResumo"></canvas>
-    </div>
-
-    <div class="card chart-card">
-        <div class="card-header">
-            <h3>Turnos do dia</h3>
-        </div>
-        <canvas id="graficoTurnos"></canvas>
-    </div>
-</div>
-
-<div class="charts-grid">
-    <div class="card chart-card">
-        <div class="card-header">
-            <h3>Farmácias no mês</h3>
-        </div>
-        <canvas id="graficoPizza"></canvas>
-    </div>
-
-    <div class="card chart-card">
-        <div class="card-header">
-            <h3>Comparativo geral</h3>
-        </div>
-        <canvas id="graficoFarmacias"></canvas>
-    </div>
 </div>
 
 <div class="card mt-20 premium-table-card">
     <div class="card-header">
-        <h3>Últimos resultados lançados</h3>
-        <a href="{{ url_for('resultados.listar') }}" class="btn btn-secondary">Ver todos</a>
+        <h3>Detalhamento por dia da meta da vendedora</h3>
     </div>
 
-    {% if ultimos_resultados %}
+    {% if detalhes_vendedoras_mes %}
         <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
                         <th>Data</th>
-                        <th>Farmácia</th>
-                        <th>Equipe</th>
+                        <th>Vendedora</th>
                         <th>Turno</th>
-                        <th>Valor</th>
-                        <th>Pedidos</th>
+                        <th>Tipo do dia</th>
+                        <th>Badge</th>
+                        <th>Meta do dia</th>
+                        <th>Feriado</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for resultado in ultimos_resultados %}
+                    {% for item in detalhes_vendedoras_mes %}
                     <tr>
-                        <td>{{ resultado.data_resultado.strftime('%d/%m/%Y') }}</td>
-                        <td>{{ resultado.farmacia.nome }}</td>
-                        <td>{{ resultado.equipe.nome }}</td>
-                        <td><span class="badge badge-info">{{ resultado.turno }}</span></td>
-                        <td>R$ {{ "%.2f"|format(resultado.valor_realizado or 0) }}</td>
-                        <td>{{ resultado.pedidos_realizados or 0 }}</td>
+                        <td>{{ item.data.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ item.vendedora_nome }}</td>
+                        <td><span class="badge badge-info">{{ item.turno }}</span></td>
+                        <td>{{ item.tipo_dia }}</td>
+                        <td>
+                            <span class="badge" style="background: {{ item.badge_cor }}; color: #fff;">
+                                {{ item.badge_nome }}
+                            </span>
+                        </td>
+                        <td><strong>R$ {{ "%.2f"|format(item.meta_individual) }}</strong></td>
+                        <td>{{ item.feriado_descricao or "-" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     {% else %}
-        <p class="empty-state">Nenhum resultado lançado ainda.</p>
+        <p class="empty-state">Sem detalhamento mensal ainda.</p>
     {% endif %}
 </div>
 
 <div class="card mt-20 premium-table-card">
     <div class="card-header">
-        <h3>Ranking das equipes</h3>
+        <h3>Calendário resumido do mês — {{ "%02d"|format(mes) }}/{{ ano }}</h3>
     </div>
 
-    {% if ranking_equipes %}
+    {% if calendario_resumo %}
         <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Equipe</th>
-                        <th>Farmácia</th>
-                        <th>Turno</th>
-                        <th>Valor realizado</th>
-                        <th>Pedidos</th>
+                        <th>Data</th>
+                        <th>Tipo do dia</th>
+                        <th>Badge</th>
+                        <th>Valor manhã</th>
+                        <th>Qtd manhã</th>
+                        <th>Meta indiv. manhã</th>
+                        <th>Valor tarde</th>
+                        <th>Qtd tarde</th>
+                        <th>Meta indiv. tarde</th>
+                        <th>Feriado</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for equipe in ranking_equipes %}
+                    {% for item in calendario_resumo %}
                     <tr>
-                        <td>{{ loop.index }}</td>
-                        <td>{{ equipe.nome }}</td>
-                        <td>{{ equipe.farmacia_nome }}</td>
-                        <td><span class="badge badge-info">{{ equipe.turno }}</span></td>
-                        <td>R$ {{ "%.2f"|format(equipe.total_valor or 0) }}</td>
-                        <td>{{ equipe.total_pedidos or 0 }}</td>
+                        <td>{{ item.data.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ item.tipo_dia }}</td>
+                        <td>
+                            <span class="badge" style="background: {{ item.badge_cor }}; color: #fff;">
+                                {{ item.badge_nome }}
+                            </span>
+                        </td>
+                        <td>R$ {{ "%.2f"|format(item.valor_manha) }}</td>
+                        <td>{{ item.qtd_manha }}</td>
+                        <td>R$ {{ "%.2f"|format(item.meta_individual_manha) }}</td>
+                        <td>R$ {{ "%.2f"|format(item.valor_tarde) }}</td>
+                        <td>{{ item.qtd_tarde }}</td>
+                        <td>R$ {{ "%.2f"|format(item.meta_individual_tarde) }}</td>
+                        <td>{{ item.feriado_descricao or "-" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     {% else %}
-        <p class="empty-state">Ainda não há ranking de equipes para mostrar.</p>
+        <p class="empty-state">Nenhum dado mensal para mostrar.</p>
     {% endif %}
 </div>
-
-<div class="tables-grid">
-    <div class="card premium-table-card">
-        <div class="card-header">
-            <h3>Ranking de farmácias</h3>
-        </div>
-
-        {% if ranking_farmacias %}
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Farmácia</th>
-                            <th>Valor realizado</th>
-                            <th>Pedidos</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for farmacia in ranking_farmacias %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td>{{ farmacia.nome }}</td>
-                            <td>R$ {{ "%.2f"|format(farmacia.total_valor or 0) }}</td>
-                            <td>{{ farmacia.total_pedidos or 0 }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p class="empty-state">Ainda não há ranking de farmácias para mostrar.</p>
-        {% endif %}
-    </div>
-
-    <div class="card premium-table-card">
-        <div class="card-header">
-            <h3>Comparativo por farmácia</h3>
-        </div>
-
-        {% if comparativo_farmacias %}
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Farmácia</th>
-                            <th>Meta do mês</th>
-                            <th>Realizado mês</th>
-                            <th>% atingido</th>
-                            <th>Falta</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in comparativo_farmacias %}
-                        <tr>
-                            <td>{{ item.farmacia_nome }}</td>
-                            <td>R$ {{ "%.2f"|format(item.meta_mes or 0) }}</td>
-                            <td>R$ {{ "%.2f"|format(item.realizado_mes or 0) }}</td>
-                            <td>
-                                <span class="badge {% if item.percentual >= 100 %}badge-success{% elif item.percentual >= 70 %}badge-info{% else %}badge-danger{% endif %} {% if item.percentual < 40 %}blink-soft{% endif %}">
-                                    {{ item.percentual }}%
-                                </span>
-                            </td>
-                            <td>R$ {{ "%.2f"|format(item.falta or 0) }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p class="empty-state">Nenhum comparativo disponível.</p>
-        {% endif %}
-    </div>
+{% else %}
+<div class="card mt-20">
+    <p class="empty-state">Selecione uma farmácia para visualizar o painel.</p>
 </div>
-
-<div class="tables-grid mt-20">
-    <div class="card premium-table-card">
-        <div class="card-header">
-            <h3>Últimas metas cadastradas</h3>
-            <a href="{{ url_for('metas.listar') }}" class="btn btn-secondary">Ver metas</a>
-        </div>
-
-        {% if ultimas_metas %}
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Farmácia</th>
-                            <th>Tipo</th>
-                            <th>Valor meta</th>
-                            <th>Pedidos meta</th>
-                            <th>Período</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for meta in ultimas_metas %}
-                        <tr>
-                            <td>{{ meta.farmacia.nome }}</td>
-                            <td>{{ meta.tipo }}</td>
-                            <td>R$ {{ "%.2f"|format(meta.valor_meta or 0) }}</td>
-                            <td>{{ meta.pedidos_meta or 0 }}</td>
-                            <td>
-                                {% if meta.data_inicio and meta.data_fim %}
-                                    {{ meta.data_inicio.strftime('%d/%m/%Y') }} até {{ meta.data_fim.strftime('%d/%m/%Y') }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p class="empty-state">Nenhuma meta cadastrada ainda.</p>
-        {% endif %}
-    </div>
-
-    <div class="card premium-table-card">
-        <div class="card-header">
-            <h3>Últimas equipes cadastradas</h3>
-            <a href="{{ url_for('equipes.listar') }}" class="btn btn-secondary">Ver equipes</a>
-        </div>
-
-        {% if ultimas_equipes %}
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Farmácia</th>
-                            <th>Equipe</th>
-                            <th>Turno</th>
-                            <th>Responsável</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for equipe in ultimas_equipes %}
-                        <tr>
-                            <td>{{ equipe.farmacia.nome }}</td>
-                            <td>{{ equipe.nome }}</td>
-                            <td><span class="badge badge-info">{{ equipe.turno }}</span></td>
-                            <td>{{ equipe.responsavel or "-" }}</td>
-                            <td>
-                                <span class="badge {% if equipe.status == 'ativa' %}badge-success{% else %}badge-danger{% endif %}">
-                                    {{ equipe.status }}
-                                </span>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p class="empty-state">Nenhuma equipe cadastrada ainda.</p>
-        {% endif %}
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const graficoResumoCtx = document.getElementById('graficoResumo');
-    const graficoTurnosCtx = document.getElementById('graficoTurnos');
-    const graficoFarmaciasCtx = document.getElementById('graficoFarmacias');
-    const graficoPizzaCtx = document.getElementById('graficoPizza');
-
-    const tickColor = '#64748b';
-    const gridColor = 'rgba(148, 163, 184, 0.16)';
-
-    function gradiente(ctx, cor1, cor2) {
-        const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 320);
-        gradient.addColorStop(0, cor1);
-        gradient.addColorStop(1, cor2);
-        return gradient;
-    }
-
-    function corMeta(ctx) {
-        return gradiente(ctx, '#8b5cf6', '#2563eb');
-    }
-
-    function corMetaLaranja(ctx) {
-        return gradiente(ctx, '#f59e0b', '#ea580c');
-    }
-
-    function corRealizadoPorComparacao(ctx, datasetMeta) {
-        const index = ctx.dataIndex;
-        const valorRealizado = Number(ctx.raw || 0);
-        const valorMeta = Number(datasetMeta[index] || 0);
-
-        if (valorMeta <= 0) {
-            return gradiente(ctx, '#06b6d4', '#2563eb');
-        }
-
-        const percentual = (valorRealizado / valorMeta) * 100;
-
-        if (percentual >= 100) {
-            return gradiente(ctx, '#22c55e', '#16a34a');
-        } else if (percentual >= 70) {
-            return gradiente(ctx, '#f59e0b', '#d97706');
-        } else {
-            return gradiente(ctx, '#ef4444', '#dc2626');
-        }
-    }
-
-    const opcoesPadrao = {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: {
-            duration: 1400,
-            easing: 'easeOutQuart'
-        },
-        layout: {
-            padding: 10
-        },
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    color: tickColor,
-                    font: {
-                        weight: '700'
-                    },
-                    padding: 18
-                }
-            },
-            tooltip: {
-                backgroundColor: '#0f172a',
-                titleColor: '#ffffff',
-                bodyColor: '#ffffff',
-                padding: 12,
-                cornerRadius: 12,
-                displayColors: true
-            }
-        },
-        scales: {
-            x: {
-                ticks: {
-                    color: tickColor,
-                    font: { weight: '700' }
-                },
-                grid: {
-                    color: gridColor
-                }
-            },
-            y: {
-                ticks: {
-                    color: tickColor
-                },
-                grid: {
-                    color: gridColor
-                }
-            }
-        }
-    };
-
-    if (graficoResumoCtx) {
-        const metasResumo = {{ grafico_resumo_meta|tojson }};
-        const realizadoResumo = {{ grafico_resumo_realizado|tojson }};
-
-        new Chart(graficoResumoCtx, {
-            type: 'bar',
-            data: {
-                labels: {{ grafico_resumo_labels|tojson }},
-                datasets: [
-                    {
-                        label: 'Meta',
-                        data: metasResumo,
-                        backgroundColor: function(ctx) {
-                            return corMeta(ctx);
-                        },
-                        borderWidth: 0,
-                        borderRadius: 12,
-                        maxBarThickness: 48
-                    },
-                    {
-                        label: 'Realizado',
-                        data: realizadoResumo,
-                        backgroundColor: function(ctx) {
-                            return corRealizadoPorComparacao(ctx, metasResumo);
-                        },
-                        borderWidth: 0,
-                        borderRadius: 12,
-                        maxBarThickness: 48
-                    }
-                ]
-            },
-            options: opcoesPadrao
-        });
-    }
-
-    if (graficoTurnosCtx) {
-        const metasTurnos = {{ grafico_turnos_meta|tojson }};
-        const realizadoTurnos = {{ grafico_turnos_realizado|tojson }};
-
-        new Chart(graficoTurnosCtx, {
-            type: 'bar',
-            data: {
-                labels: {{ grafico_turnos_labels|tojson }},
-                datasets: [
-                    {
-                        label: 'Meta',
-                        data: metasTurnos,
-                        backgroundColor: function(ctx) {
-                            return ctx.dataIndex === 0 ? corMeta(ctx) : corMetaLaranja(ctx);
-                        },
-                        borderWidth: 0,
-                        borderRadius: 12,
-                        maxBarThickness: 48
-                    },
-                    {
-                        label: 'Realizado',
-                        data: realizadoTurnos,
-                        backgroundColor: function(ctx) {
-                            return corRealizadoPorComparacao(ctx, metasTurnos);
-                        },
-                        borderWidth: 0,
-                        borderRadius: 12,
-                        maxBarThickness: 48
-                    }
-                ]
-            },
-            options: opcoesPadrao
-        });
-    }
-
-    if (graficoPizzaCtx) {
-        new Chart(graficoPizzaCtx, {
-            type: 'pie',
-            data: {
-                labels: {{ grafico_pizza_labels|default([])|tojson }},
-                datasets: [{
-                    data: {{ grafico_pizza_valores|default([])|tojson }},
-                    backgroundColor: [
-                        '#2563eb',
-                        '#16a34a',
-                        '#f59e0b',
-                        '#ef4444',
-                        '#7c3aed',
-                        '#06b6d4'
-                    ],
-                    borderColor: '#ffffff',
-                    borderWidth: 4,
-                    hoverOffset: 22,
-                    spacing: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: {
-                    duration: 1400,
-                    easing: 'easeOutQuart'
-                },
-                layout: {
-                    padding: 10
-                },
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: tickColor,
-                            font: { weight: '700' },
-                            padding: 16
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: '#0f172a',
-                        titleColor: '#ffffff',
-                        bodyColor: '#ffffff',
-                        padding: 12,
-                        cornerRadius: 12
-                    }
-                }
-            }
-        });
-    }
-
-    if (graficoFarmaciasCtx) {
-        const metasFarmacias = {{ grafico_farmacias_meta|tojson }};
-        const realizadoFarmacias = {{ grafico_farmacias_realizado|tojson }};
-
-        new Chart(graficoFarmaciasCtx, {
-            type: 'bar',
-            data: {
-                labels: {{ grafico_farmacias_labels|tojson }},
-                datasets: [
-                    {
-                        label: 'Meta do mês',
-                        data: metasFarmacias,
-                        backgroundColor: function(ctx) {
-                            return corMeta(ctx);
-                        },
-                        borderWidth: 0,
-                        borderRadius: 12,
-                        maxBarThickness: 56
-                    },
-                    {
-                        label: 'Realizado do mês',
-                        data: realizadoFarmacias,
-                        backgroundColor: function(ctx) {
-                            return corRealizadoPorComparacao(ctx, metasFarmacias);
-                        },
-                        borderWidth: 0,
-                        borderRadius: 12,
-                        maxBarThickness: 56
-                    }
-                ]
-            },
-            options: opcoesPadrao
-        });
-    }
-</script>
+{% endif %}
 {% endblock %}

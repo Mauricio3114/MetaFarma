@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Relatórios | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Relatórios</h1>
+        <p>Resumo mensal e escala individual das vendedoras</p>
+    </div>
+</div>
+
+<div class="card">
+    <form method="GET" class="filter-bar filter-bar-4">
+        <select name="farmacia_id" required>
+            <option value="">Selecione a farmácia</option>
+            {% for farmacia in farmacias %}
+                <option value="{{ farmacia.id }}" {% if farmacia_id == farmacia.id %}selected{% endif %}>
+                    {{ farmacia.nome }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <input type="number" name="mes" value="{{ mes }}">
+        <input type="number" name="ano" value="{{ ano }}">
+
+        <button type="submit" class="btn btn-primary">Aplicar</button>
+    </form>
+</div>
+
+{% if farmacia_atual %}
+<div class="cards-grid cards-grid-3 mt-20">
+    <div class="card kpi-card premium-kpi">
+        <span class="kpi-label">Farmácia</span>
+        <h2>{{ farmacia_atual.nome }}</h2>
+    </div>
+
+    <div class="card kpi-card premium-kpi">
+        <span class="kpi-label">Dias trabalhados</span>
+        <h2>{{ total_dias }}</h2>
+    </div>
+
+    <div class="card kpi-card premium-kpi">
+        <span class="kpi-label">Meta total</span>
+        <h2>R$ {{ "%.2f"|format(total_meta) }}</h2>
+    </div>
+</div>
+
+<div class="card mt-20 premium-table-card">
+    <div class="card-header">
+        <h3>Resumo mensal</h3>
+
+        <a href="{{ url_for('relatorios.pdf_mensal',
+            farmacia_id=farmacia_id,
+            mes=mes,
+            ano=ano) }}"
+           class="btn btn-primary"
+           target="_blank">
+           Emitir PDF Metas
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Vendedora</th>
+                    <th>Turno</th>
+                    <th>Dias</th>
+                    <th>Meta</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in resumo %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+
+                    <!-- 🔥 NOME CLICÁVEL -->
+                    <td>
+                        <a href="{{ url_for('relatorios.pdf_escala_vendedora',
+                            farmacia_id=farmacia_id,
+                            vendedora_id=item.vendedora_id,
+                            mes=mes,
+                            ano=ano) }}"
+                           target="_blank"
+                           style="color:#2563eb; font-weight:600; text-decoration:none;">
+                            {{ item.nome }}
+                        </a>
+                    </td>
+
+                    <td>
+                        <span class="badge badge-info">{{ item.turno }}</span>
+                    </td>
+
+                    <td>{{ item.dias_trabalhados }}</td>
+
+                    <td>
+                        <strong>R$ {{ "%.2f"|format(item.meta_total) }}</strong>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

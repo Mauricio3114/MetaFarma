@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Editar Configuração | MetaFarma{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Editar configuração de dia</h1>
+        <p>Atualize o tipo do dia e a badge</p>
+    </div>
+</div>
+
+<div class="card form-card">
+    <form method="POST" class="form-grid">
+        <div class="form-group">
+            <label>Farmácia</label>
+            <select name="farmacia_id" required>
+                {% for farmacia in farmacias %}
+                    <option value="{{ farmacia.id }}" {% if config.farmacia_id == farmacia.id %}selected{% endif %}>{{ farmacia.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Tipo do dia</label>
+            <select name="tipo_dia" required>
+                {% for tipo in tipos_dia %}
+                    <option value="{{ tipo }}" {% if config.tipo_dia == tipo %}selected{% endif %}>{{ tipo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Badge</label>
+            <select name="badge_id" required>
+                {% for badge in badges %}
+                    <option value="{{ badge.id }}" {% if config.badge_id == badge.id %}selected{% endif %}>
+                        {{ badge.nome }} | Manhã R$ {{ "%.2f"|format(badge.valor_manha or 0) }} | Tarde R$ {{ "%.2f"|format(badge.valor_tarde or 0) }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Observação</label>
+            <textarea name="observacao" rows="4">{{ config.observacao or '' }}</textarea>
+        </div>
+
+        <div class="form-actions full-width">
+            <a href="{{ url_for('configuracoes_dia.listar') }}" class="btn btn-secondary">Voltar</a>
+            <button type="submit" class="btn btn-primary">Atualizar</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Calendário Mensal | MetaFarma{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Calendário mensal</h1>
+        <p>Marque os dias em que a vendedora trabalha ou folga. Pode usar o turno fixo ou trocar o turno no dia.</p>
+    </div>
+</div>
+
+<div class="card">
+    <form method="GET" class="form-grid">
+        <div class="form-group">
+            <label>Farmácia</label>
+            <select name="farmacia_id" required onchange="this.form.submit()">
+                <option value="">Selecione</option>
+                {% for farmacia in farmacias %}
+                    <option value="{{ farmacia.id }}" {% if farmacia_id == farmacia.id %}selected{% endif %}>
+                        {{ farmacia.nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Vendedora</label>
+            <select name="vendedora_id" {% if farmacia_id %}required{% endif %} onchange="this.form.submit()">
+                <option value="">Selecione</option>
+                {% for vendedora in vendedoras %}
+                    <option value="{{ vendedora.id }}" {% if vendedora_id == vendedora.id %}selected{% endif %}>
+                        {{ vendedora.nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Mês</label>
+            <input type="number" name="mes" min="1" max="12" value="{{ mes }}">
+        </div>
+
+        <div class="form-group">
+            <label>Ano</label>
+            <input type="number" name="ano" min="2024" max="2100" value="{{ ano }}">
+        </div>
+
+        <div class="form-actions full-width">
+            <button type="submit" class="btn btn-primary">Carregar calendário</button>
+        </div>
+    </form>
+</div>
+
+{% if farmacia_id and vendedora_id %}
+<div class="cards-grid cards-grid-3 mt-20">
+    <div class="card kpi-card premium-kpi">
+        <span class="kpi-label">Mês / Ano</span>
+        <h2>{{ "%02d"|format(mes) }}/{{ ano }}</h2>
+    </div>
+
+    <div class="card kpi-card premium-kpi">
+        <span class="kpi-label">Turno fixo</span>
+        <h2>{{ turno_fixo or "-" }}</h2>
+    </div>
+
+    <div class="card kpi-card premium-kpi">
+        <span class="kpi-label">Legenda</span>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+            <span class="badge badge-success">Trabalha</span>
+            <span class="badge badge-danger">Folga</span>
+            <span class="badge badge-info">Sem marcação</span>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-20 premium-table-card">
+    <div class="card-header">
+        <h3>Calendário clicável</h3>
+    </div>
+
+    <div class="calendario-mensal">
+        <div class="calendario-header">Dom</div>
+        <div class="calendario-header">Seg</div>
+        <div class="calendario-header">Ter</div>
+        <div class="calendario-header">Qua</div>
+        <div class="calendario-header">Qui</div>
+        <div class="calendario-header">Sex</div>
+        <div class="calendario-header">Sáb</div>
+
+        {% for semana in semanas %}
+            {% for dia in semana %}
+                {% set registro = mapa_registros.get(dia) %}
+                {% set feriado = mapa_feriados.get(dia) %}
+                {% set fora_mes = dia.month != mes %}
+
+                <div class="dia-box
+                    {% if fora_mes %}dia-fora-mes{% endif %}
+                    {% if registro and registro.trabalha %} dia-trabalha{% endif %}
+                    {% if registro and not registro.trabalha %} dia-folga{% endif %}
+                    {% if feriado %} dia-feriado{% endif %}
+                ">
+                    <div class="dia-topo">
+                        <span class="dia-numero">{{ dia.day }}</span>
+                        {% if feriado %}
+                            <span class="mini-badge-feriado">Feriado</span>
+                        {% endif %}
+                    </div>
+
+                    {% if feriado %}
+                        <div class="dia-feriado-texto">{{ feriado.descricao }}</div>
+                    {% endif %}
+
+                    {% if not fora_mes %}
+                        <div class="dia-status">
+                            {% if registro %}
+                                {% if registro.trabalha %}
+                                    <span class="badge badge-success">Trabalha</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Folga</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge badge-info">Sem marcação</span>
+                            {% endif %}
+                        </div>
+
+                        <div style="margin-bottom:8px;">
+                            <strong style="font-size:12px; color:#334155;">Turno do dia:</strong>
+                            <div style="font-size:12px; color:#64748b; margin-top:4px;">
+                                {% if registro %}
+                                    {{ registro.turno_dia }}
+                                {% else %}
+                                    fixo
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="dia-acoes">
+                            <form method="POST" class="form-dia">
+                                <input type="hidden" name="farmacia_id" value="{{ farmacia_id }}">
+                                <input type="hidden" name="vendedora_id" value="{{ vendedora_id }}">
+                                <input type="hidden" name="mes" value="{{ mes }}">
+                                <input type="hidden" name="ano" value="{{ ano }}">
+                                <input type="hidden" name="data" value="{{ dia.strftime('%Y-%m-%d') }}">
+
+                                <select name="turno_dia" class="select-turno-dia">
+                                    <option value="fixo" {% if registro and registro.turno_dia == 'fixo' %}selected{% elif not registro %}selected{% endif %}>Usar fixo</option>
+                                    <option value="manha" {% if registro and registro.turno_dia == 'manha' %}selected{% endif %}>Manhã</option>
+                                    <option value="tarde" {% if registro and registro.turno_dia == 'tarde' %}selected{% endif %}>Tarde</option>
+                                </select>
+
+                                <div class="acoes-dia-botoes">
+                                    <button type="submit" name="acao" value="trabalha" class="btn-cal btn-cal-success">Trabalha</button>
+                                    <button type="submit" name="acao" value="folga" class="btn-cal btn-cal-danger">Folga</button>
+                                    <button type="submit" name="acao" value="limpar" class="btn-cal btn-cal-neutral">Limpar</button>
+                                </div>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="card mt-20">
+    <p class="empty-state">Selecione a farmácia e a vendedora para abrir o calendário.</p>
+</div>
+{% endif %}
+{% endblock %}
