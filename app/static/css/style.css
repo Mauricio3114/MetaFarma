@@ -887,3 +887,246 @@ tbody tr:hover {
     flex-direction: column;
     gap: 6px;
 }
+
+/* =========================
+   DASHBOARD PREMIUM LEVEL
+========================= */
+
+/* KPI destaque (meta dinheiro) */
+.kpi-money {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: #fff;
+    box-shadow: 0 12px 30px rgba(34,197,94,0.35);
+}
+
+.kpi-money .kpi-label {
+    color: rgba(255,255,255,0.85);
+}
+
+.kpi-money h2 {
+    color: #fff;
+}
+
+/* animação leve nos cards */
+.premium-kpi {
+    transition: all 0.25s ease;
+}
+
+.premium-kpi:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}
+
+/* header mais forte */
+.premium-header h1 {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* card header mais bonito */
+.card-header {
+    border-bottom: 1px solid #e5edf7;
+    padding-bottom: 10px;
+}
+
+/* tabela premium */
+.premium-table-card table {
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+/* cabeçalho vermelho (marca da farmácia) */
+.premium-table-card thead {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.premium-table-card thead th {
+    color: #fff;
+    font-size: 12px;
+}
+
+/* zebra mais suave */
+.premium-table-card tbody tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+/* hover mais elegante */
+.premium-table-card tbody tr:hover {
+    background: #eef2f7;
+}
+
+/* badge mais moderna */
+.badge {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* destaque de valor */
+td strong {
+    color: #16a34a;
+    font-weight: 800;
+}
+
+/* empty state centralizado */
+.empty-state {
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* botão aplicar premium */
+.btn-primary {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+    box-shadow: 0 8px 20px rgba(220,38,38,0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+}
+
+/* filtros mais bonitos */
+.filter-bar select,
+.filter-bar input {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+/* =========================
+   DASHBOARD PREMIUM EXTRA
+========================= */
+
+.dashboard-filter-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px solid #dfe8f3;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.section-card {
+    border-radius: 22px;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+}
+
+.section-header h3 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    color: #13294b;
+}
+
+.nome-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #eef2f7 0%, #e5ebf3 100%);
+    border: 1px solid #d5deea;
+    color: #1b2b48;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.nome-chip-soft {
+    background: linear-gradient(180deg, #f3f6fa 0%, #e9eef5 100%);
+}
+
+.tipo-dia-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: lowercase;
+}
+
+.kpi-money {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: #fff;
+    box-shadow: 0 16px 34px rgba(34, 197, 94, 0.28);
+    border: none;
+}
+
+.kpi-money .kpi-label {
+    color: rgba(255,255,255,0.84);
+}
+
+.kpi-money h2 {
+    color: #fff;
+}
+
+.premium-kpi {
+    transition: all 0.25s ease;
+}
+
+.premium-kpi:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}
+
+.premium-header h1 {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.premium-table-card {
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+}
+
+.premium-table-card table {
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.premium-table-card thead {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.premium-table-card thead th {
+    color: #fff;
+    font-size: 12px;
+    letter-spacing: 0.4px;
+}
+
+.premium-table-card tbody tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+.premium-table-card tbody tr:hover {
+    background: #eef2f7;
+}
+
+.premium-table-card tbody td {
+    vertical-align: middle;
+}
+
+td strong {
+    color: #16a34a;
+    font-weight: 800;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 22px;
+    font-style: italic;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.28);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+}
+
+.filter-bar select,
+.filter-bar input {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}

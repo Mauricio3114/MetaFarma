@@ -10,7 +10,7 @@
     </div>
 </div>
 
-<div class="card">
+<div class="card dashboard-filter-card">
     <form method="GET" class="filter-bar filter-bar-4">
         <select name="farmacia_id" required>
             <option value="">Selecione a farmácia</option>
@@ -51,6 +51,7 @@
 </div>
 
 {% if farmacia_atual %}
+
 <div class="cards-grid cards-grid-3 mt-20">
     <div class="card kpi-card premium-kpi">
         <span class="kpi-label">Farmácia selecionada</span>
@@ -62,229 +63,139 @@
         <h2>{{ total_dias_trabalhados_mes }}</h2>
     </div>
 
-    <div class="card kpi-card premium-kpi">
+    <div class="card kpi-card premium-kpi kpi-money">
         <span class="kpi-label">Meta mensal somada</span>
         <h2>R$ {{ "%.2f"|format(total_meta_mensal_vendedoras) }}</h2>
     </div>
 </div>
 
-<div class="card mt-20 premium-table-card">
-    <div class="card-header">
-        <h3>Escala do dia atual — {{ hoje.strftime('%d/%m/%Y') }}</h3>
+<div class="card mt-20 premium-table-card section-card">
+    <div class="card-header section-header">
+        <h3>Escala do dia — {{ hoje.strftime('%d/%m/%Y') }}</h3>
     </div>
 
     {% if escalas_hoje %}
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tipo do dia</th>
-                        <th>Badge</th>
-                        <th>Valor manhã</th>
-                        <th>Qtd manhã</th>
-                        <th>Meta indiv. manhã</th>
-                        <th>Valor tarde</th>
-                        <th>Qtd tarde</th>
-                        <th>Meta indiv. tarde</th>
-                        <th>Feriado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in escalas_hoje %}
-                    <tr>
-                        <td>{{ item.tipo_dia }}</td>
-                        <td>
-                            <span class="badge" style="background: {{ item.badge_cor }}; color: #fff;">
-                                {{ item.badge_nome }}
-                            </span>
-                        </td>
-                        <td>R$ {{ "%.2f"|format(item.valor_manha) }}</td>
-                        <td>{{ item.qtd_manha }}</td>
-                        <td>R$ {{ "%.2f"|format(item.meta_individual_manha) }}</td>
-                        <td>R$ {{ "%.2f"|format(item.valor_tarde) }}</td>
-                        <td>{{ item.qtd_tarde }}</td>
-                        <td>R$ {{ "%.2f"|format(item.meta_individual_tarde) }}</td>
-                        <td>{{ item.feriado_descricao or "-" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Badge</th>
+                    <th>Manhã</th>
+                    <th>Qtd</th>
+                    <th>Meta</th>
+                    <th>Tarde</th>
+                    <th>Qtd</th>
+                    <th>Meta</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in escalas_hoje %}
+                <tr>
+                    <td><span class="tipo-dia-chip">{{ item.tipo_dia }}</span></td>
+                    <td>
+                        <span class="badge" style="background: {{ item.badge_cor }}; color:#fff;">
+                            {{ item.badge_nome }}
+                        </span>
+                    </td>
+                    <td>R$ {{ "%.2f"|format(item.valor_manha) }}</td>
+                    <td>{{ item.qtd_manha }}</td>
+                    <td><strong>R$ {{ "%.2f"|format(item.meta_individual_manha) }}</strong></td>
+                    <td>R$ {{ "%.2f"|format(item.valor_tarde) }}</td>
+                    <td>{{ item.qtd_tarde }}</td>
+                    <td><strong>R$ {{ "%.2f"|format(item.meta_individual_tarde) }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
         <p class="empty-state">Sem configuração para hoje.</p>
     {% endif %}
 </div>
 
-<div class="card mt-20 premium-table-card">
-    <div class="card-header">
+<div class="card mt-20 premium-table-card section-card">
+    <div class="card-header section-header">
         <h3>Quem trabalha hoje</h3>
     </div>
 
     {% if painel_hoje %}
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Vendedora</th>
-                        <th>Turno</th>
-                        <th>Badge</th>
-                        <th>Valor do turno</th>
-                        <th>Qtd no turno</th>
-                        <th>Meta individual</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in painel_hoje %}
-                    <tr>
-                        <td>{{ item.nome }}</td>
-                        <td><span class="badge badge-info">{{ item.turno }}</span></td>
-                        <td>
-                            <span class="badge" style="background: {{ item.badge_cor }}; color: #fff;">
-                                {{ item.badge_nome }}
-                            </span>
-                        </td>
-                        <td>R$ {{ "%.2f"|format(item.valor_turno) }}</td>
-                        <td>{{ item.qtd_turno }}</td>
-                        <td><strong>R$ {{ "%.2f"|format(item.meta_individual) }}</strong></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Vendedora</th>
+                    <th>Turno</th>
+                    <th>Badge</th>
+                    <th>Meta</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in painel_hoje %}
+                <tr>
+                    <td>
+                        <span class="nome-chip">
+                            {{ item.nome }}
+                        </span>
+                    </td>
+                    <td><span class="badge badge-info">{{ item.turno }}</span></td>
+                    <td>
+                        <span class="badge" style="background: {{ item.badge_cor }}; color:#fff;">
+                            {{ item.badge_nome }}
+                        </span>
+                    </td>
+                    <td><strong>R$ {{ "%.2f"|format(item.meta_individual) }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
-        <p class="empty-state">Nenhuma vendedora marcada para hoje.</p>
+        <p class="empty-state">Nenhuma vendedora marcada.</p>
     {% endif %}
 </div>
 
-<div class="card mt-20 premium-table-card">
-    <div class="card-header">
-        <h3>Resumo mensal por vendedora — {{ "%02d"|format(mes) }}/{{ ano }}</h3>
+<div class="card mt-20 premium-table-card section-card">
+    <div class="card-header section-header">
+        <h3>Resumo mensal — {{ "%02d"|format(mes) }}/{{ ano }}</h3>
     </div>
 
     {% if resumo_vendedoras_mes %}
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Vendedora</th>
-                        <th>Turno</th>
-                        <th>Dias trabalhados</th>
-                        <th>Meta mensal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in resumo_vendedoras_mes %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td>{{ item.nome }}</td>
-                        <td><span class="badge badge-info">{{ item.turno }}</span></td>
-                        <td>{{ item.dias_trabalhados }}</td>
-                        <td><strong>R$ {{ "%.2f"|format(item.meta_total) }}</strong></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <p class="empty-state">Nenhuma meta mensal calculada ainda. Marca os dias no calendário mensal.</p>
-    {% endif %}
-</div>
-
-<div class="card mt-20 premium-table-card">
-    <div class="card-header">
-        <h3>Detalhamento por dia da meta da vendedora</h3>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Vendedora</th>
+                    <th>Dias</th>
+                    <th>Meta</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in resumo_vendedoras_mes %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>
+                        <span class="nome-chip nome-chip-soft">
+                            {{ item.nome }}
+                        </span>
+                    </td>
+                    <td>{{ item.dias_trabalhados }}</td>
+                    <td><strong>R$ {{ "%.2f"|format(item.meta_total) }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-
-    {% if detalhes_vendedoras_mes %}
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Vendedora</th>
-                        <th>Turno</th>
-                        <th>Tipo do dia</th>
-                        <th>Badge</th>
-                        <th>Meta do dia</th>
-                        <th>Feriado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in detalhes_vendedoras_mes %}
-                    <tr>
-                        <td>{{ item.data.strftime('%d/%m/%Y') }}</td>
-                        <td>{{ item.vendedora_nome }}</td>
-                        <td><span class="badge badge-info">{{ item.turno }}</span></td>
-                        <td>{{ item.tipo_dia }}</td>
-                        <td>
-                            <span class="badge" style="background: {{ item.badge_cor }}; color: #fff;">
-                                {{ item.badge_nome }}
-                            </span>
-                        </td>
-                        <td><strong>R$ {{ "%.2f"|format(item.meta_individual) }}</strong></td>
-                        <td>{{ item.feriado_descricao or "-" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
     {% else %}
-        <p class="empty-state">Sem detalhamento mensal ainda.</p>
+        <p class="empty-state">Nenhum dado mensal ainda.</p>
     {% endif %}
 </div>
 
-<div class="card mt-20 premium-table-card">
-    <div class="card-header">
-        <h3>Calendário resumido do mês — {{ "%02d"|format(mes) }}/{{ ano }}</h3>
-    </div>
-
-    {% if calendario_resumo %}
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Tipo do dia</th>
-                        <th>Badge</th>
-                        <th>Valor manhã</th>
-                        <th>Qtd manhã</th>
-                        <th>Meta indiv. manhã</th>
-                        <th>Valor tarde</th>
-                        <th>Qtd tarde</th>
-                        <th>Meta indiv. tarde</th>
-                        <th>Feriado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in calendario_resumo %}
-                    <tr>
-                        <td>{{ item.data.strftime('%d/%m/%Y') }}</td>
-                        <td>{{ item.tipo_dia }}</td>
-                        <td>
-                            <span class="badge" style="background: {{ item.badge_cor }}; color: #fff;">
-                                {{ item.badge_nome }}
-                            </span>
-                        </td>
-                        <td>R$ {{ "%.2f"|format(item.valor_manha) }}</td>
-                        <td>{{ item.qtd_manha }}</td>
-                        <td>R$ {{ "%.2f"|format(item.meta_individual_manha) }}</td>
-                        <td>R$ {{ "%.2f"|format(item.valor_tarde) }}</td>
-                        <td>{{ item.qtd_tarde }}</td>
-                        <td>R$ {{ "%.2f"|format(item.meta_individual_tarde) }}</td>
-                        <td>{{ item.feriado_descricao or "-" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <p class="empty-state">Nenhum dado mensal para mostrar.</p>
-    {% endif %}
-</div>
 {% else %}
 <div class="card mt-20">
-    <p class="empty-state">Selecione uma farmácia para visualizar o painel.</p>
+    <p class="empty-state">Selecione uma farmácia para visualizar.</p>
 </div>
 {% endif %}
+
 {% endblock %}
